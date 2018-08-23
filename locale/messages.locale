@@ -1,0 +1,19 @@
+[MAX-NOTIFICATIONS]
+%WONDER, {0.author.mention}, you do %KNOW that %MAXNAME doesn't %GET %NOTIFICATIONS from here, right?
+%HEY {0.author.mention}, %MAXNAME doesn't %GET %NOTIFICATIONS from here, you better DM him instead
+%LAUGH, %MAXNAME doesn't %GET %NOTIFICATIONS from here, you lemon
+{0.author.mention}, I %THOUGHT that by now you'd %KNOW that %MAXNAME doesn't %GET %NOTIFICATIONS from here
+You know, {0.author.mention}, %MAXNAME went through all the trouble of coding a bot (me!) just so I could tell you that he doesn't %GET discord %NOTIFICATIONS
+
+[IF-INSULTED]
+no u
+
+[INSULT]
+%YOU %INSULT
+%YOURE %INSULT
+%YOURE a %INSULT
+%YOURE an %INSULT
+
+[WHAT-YOU-WANT]
+{0.author.mention} %HEY
+{0.author.mention} what do you %WANT
