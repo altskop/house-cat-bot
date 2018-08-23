@@ -1,7 +1,10 @@
 # Onyx Bot Alpha
 
+![python3.6](https://img.shields.io/badge/python-3.6-blue.svg)
+
 OnyxBot is a discord bot written in Python for my personal use. 
 It uses the [discord.py](https://github.com/Rapptz/discord.py/tree/rewrite) library written by Rapptz.
+
 The bot should be relatively easy to reconfigure and reprogram should you want to have one for yourself.
 
 ## Core Features:
