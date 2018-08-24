@@ -3,15 +3,15 @@ import random
 
 
 class ResponseBuilder:
-    def __init__(self, config):
+    def __init__(self, config: dict):
         self.config = config
         self.dictionary = self.read_templates("dictionary.locale")
         self.message_templates = self.read_templates("messages.locale")
 
-    def get_response(self, key):
+    def get_response(self, key: str) -> str:
         return self.build_response(random.choice(self.message_templates.get(key)))
 
-    def build_response(self, string):
+    def build_response(self, string: str) -> str:
         pattern = re.compile("%[A-Z]+")
         # here we will substitute every %WORD occurrence from string with actual choices from dictionary or responses
         for (word) in re.findall(pattern, string):
@@ -22,7 +22,7 @@ class ResponseBuilder:
         string = string[0].upper() + string[1:]
         return string
 
-    def truncate_mentions(self, msg):
+    def truncate_mentions(self, msg: str) -> str:
 
         mention_pattern = re.compile("(<@!*\d+>\s*)")
         new_text = msg
@@ -30,7 +30,7 @@ class ResponseBuilder:
         new_text = self.cleanup_spaces(new_text)
         return new_text
 
-    def msg_fits_template(self, key, msg):
+    def msg_fits_template(self, key, msg: str) -> bool:
 
         any_pattern = re.compile("[a-zA-z]")
 
@@ -59,12 +59,12 @@ class ResponseBuilder:
                     return True
         return False
 
-    def cleanup_spaces(self, string):
+    def cleanup_spaces(self, string: str) -> str:
         if string[-1:] == " ":
             string = string [:-1]
         return ' '.join(string.split())
 
-    def read_templates(self, filename):
+    def read_templates(self, filename: str) -> dict:
         responses = {}
         tag_pattern = re.compile("\[[A-Z-?]+\]")
         with open("locale/" + filename, "r") as file:
