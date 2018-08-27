@@ -1,5 +1,7 @@
 import discord
 import response_builder as resp
+import database_handler
+import voice
 
 config = {}
 
@@ -20,6 +22,8 @@ class OnyxBot(discord.Client):
         super().__init__(*args, **kwargs)
         self.responseBuilder = resp.ResponseBuilder(config)
 
+    # @event
+    # What to do when we receive a message
     async def on_message(self, message):
         # we do not want the bot to parse itself
         if message.author == bot.user:
@@ -35,6 +39,7 @@ class OnyxBot(discord.Client):
             print("Replying: "+msg)
             await message.channel.send(msg.format(message))
 
+    # If the message is in a public server
     def handle_public_message(self, message):
 
         #print(message.mentions)
@@ -58,12 +63,14 @@ class OnyxBot(discord.Client):
 
         return ""
 
+    # If the starts with & and the message was in public server
     def handle_command(self, message):
         if message.content == "&disconnect":
             # leave voice channel
             return "Leaving channel..."
         return ""
 
+    # If the message was a DM
     def handle_private_message(self, message):
 
         if message.content.startswith("say "):
