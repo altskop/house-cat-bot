@@ -1,6 +1,8 @@
 import discord
-from discord.ext import commands
+import time
+import os
 from gtts import gTTS
+
 
 if not discord.opus.is_loaded():
     # the 'opus' library here is opus.dll on windows
@@ -14,70 +16,54 @@ if not discord.opus.is_loaded():
 class Voice:
     def __init__(self, bot):
         self.bot = bot
+        self.voice_clients = []
 
-    @commands.command()
-    async def join(self, ctx, *, channel: discord.VoiceChannel):
-        """Joins a voice channel"""
+    async def connect(self, voice_channel: discord.VoiceChannel):
+        voice_client = await voice_channel.connect()
+        self.voice_clients.append(voice_client)
+        time.sleep(2)
+        return voice_client
 
-        if ctx.voice_client is not None:
-            return await ctx.voice_client.move_to(channel)
+    def play(self, client, source):
+        client.play(source)
 
-        await channel.connect()
+    def play_tts(self, client, text):
+        while client.is_playing() or not client.is_connected():
+            time.sleep(1)
 
-    @commands.command()
-    async def play(self, ctx, *, query):
-        """Plays a file from the local filesystem"""
+        tts = gTTS(text=text, lang='en')
+        tts.save("tts.mp3")
+        source = discord.FFmpegPCMAudio("tts.mp3")
+        self.play(client, source)
 
-        source = discord.PCMVolumeTransformer(discord.FFmpegPCMAudio(query))
-        ctx.voice_client.play(source, after=lambda e: print('Player error: %s' % e) if e else None)
+    def find_channel_by_user(self, user):
+        guild_list = self.bot.guilds
+        for guild in guild_list:
+            voice_channels = guild.voice_channels
+            for voice_channel in voice_channels:
+                if user in voice_channel.members:
+                    return voice_channel
+        return None
 
-        await ctx.send('Now playing: {}'.format(query))
+    async def get_voice_client_for_channel(self, channel):
+        for client in self.voice_clients:
+            if client.channel.guild == channel.guild:
+                if client.channel == channel:
+                    return client
+                await client.move_to(channel)
+                return client
+        new_client = await self.connect(channel)
+        return new_client
 
-    @commands.command()
-    async def yt(self, ctx, *, url):
-        """Plays from a url (almost anything youtube_dl supports)"""
+    async def disconnect_channel(self, channel):
+        for client in self.voice_clients:
+            if client.channel == channel:
+                self.voice_clients.remove(client)
+                await client.disconnect()
 
-        async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot.loop)
-            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
+    async def disconnect_voice_from_guild(self, guild):
+        for client in self.voice_clients:
+            if client.channel.guild == guild:
+                self.voice_clients.remove(client)
+                await client.disconnect()
 
-        await ctx.send('Now playing: {}'.format(player.title))
-
-    @commands.command()
-    async def stream(self, ctx, *, url):
-        """Streams from a url (same as yt, but doesn't predownload)"""
-
-        async with ctx.typing():
-            player = await YTDLSource.from_url(url, loop=self.bot.loop, stream=True)
-            ctx.voice_client.play(player, after=lambda e: print('Player error: %s' % e) if e else None)
-
-        await ctx.send('Now playing: {}'.format(player.title))
-
-    @commands.command()
-    async def volume(self, ctx, volume: int):
-        """Changes the player's volume"""
-
-        if ctx.voice_client is None:
-            return await ctx.send("Not connected to a voice channel.")
-
-        ctx.voice_client.source.volume = volume
-        await ctx.send("Changed volume to {}%".format(volume))
-
-    @commands.command()
-    async def stop(self, ctx):
-        """Stops and disconnects the bot from voice"""
-
-        await ctx.voice_client.disconnect()
-
-    @play.before_invoke
-    @yt.before_invoke
-    @stream.before_invoke
-    async def ensure_voice(self, ctx):
-        if ctx.voice_client is None:
-            if ctx.author.voice:
-                await ctx.author.voice.channel.connect()
-            else:
-                await ctx.send("You are not connected to a voice channel.")
-                raise commands.CommandError("Author not connected to a voice channel.")
-        elif ctx.voice_client.is_playing():
-            ctx.voice_client.stop()

@@ -1,7 +1,7 @@
 import discord
 import response_builder as resp
-import database_handler
-import voice
+# import database_handler
+import voice as vc
 
 config = {}
 
@@ -21,6 +21,7 @@ class OnyxBot(discord.Client):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.responseBuilder = resp.ResponseBuilder(config)
+        self.voice = vc.Voice(self)
 
     # @event
     # What to do when we receive a message
@@ -32,20 +33,20 @@ class OnyxBot(discord.Client):
         print(message.content)
 
         if isinstance(message.channel, discord.DMChannel):
-            msg = self.handle_private_message(message)
+            msg = await self.handle_private_message(message)
         else:
-            msg = self.handle_public_message(message)
+            msg = await self.handle_public_message(message)
         if msg != "":
             print("Replying: "+msg)
             await message.channel.send(msg.format(message))
 
     # If the message is in a public server
-    def handle_public_message(self, message):
+    async def handle_public_message(self, message):
 
         #print(message.mentions)
 
         if message.content.startswith("&"):
-            return self.handle_command(message)
+            return await self.handle_command(message)
 
         elif str(config.get("CREATOR_ID")) + ">" in message.content:
             return self.responseBuilder.get_response("MAX-NOTIFICATIONS")
@@ -64,18 +65,21 @@ class OnyxBot(discord.Client):
         return ""
 
     # If the starts with & and the message was in public server
-    def handle_command(self, message):
+    async def handle_command(self, message):
         if message.content == "&disconnect":
             # leave voice channel
-            return "Leaving channel..."
+            await self.voice.disconnect_voice_from_guild(message.guild)
         return ""
 
     # If the message was a DM
-    def handle_private_message(self, message):
+    async def handle_private_message(self, message):
 
         if message.content.startswith("say "):
-            if message.author.voice_channel is not None:
-                return "Right now I can't really talk, sorry."
+            channel = self.voice.find_channel_by_user(message.author)
+            if channel is not None:
+                voice_client = await self.voice.get_voice_client_for_channel(channel)
+                self.voice.play_tts(voice_client, message.content[3:])
+                return ""
             else:
                 return "You're not connected to any voice channels"
 
