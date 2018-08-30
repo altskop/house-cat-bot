@@ -3,24 +3,14 @@ import response_builder as resp
 # import database_handler
 import voice as vc
 
-config = {}
-
-
-def read_config():
-    with open("config", "r") as file:
-        lines = [line.rstrip('\n') for line in file]
-        for line in lines:
-            conf = line.split("=")
-            config[conf[0]] = conf[1]
-    print("Configuration loaded.")
-    #print(config)
-
 
 class OnyxBot(discord.Client):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.responseBuilder = resp.ResponseBuilder(config)
+        self.config = {}
+        self.read_config()
+        self.responseBuilder = resp.ResponseBuilder(self.config)
         self.voice = vc.Voice(self)
 
     # @event
@@ -48,7 +38,7 @@ class OnyxBot(discord.Client):
         if message.content.startswith("&"):
             return await self.handle_command(message)
 
-        elif str(config.get("CREATOR_ID")) + ">" in message.content:
+        elif str(self.config.get("CREATOR_ID")) + ">" in message.content:
             return self.responseBuilder.get_response("MAX-NOTIFICATIONS")
 
         elif bot.user in message.mentions:
@@ -74,16 +64,25 @@ class OnyxBot(discord.Client):
     # If the message was a DM
     async def handle_private_message(self, message):
 
+        # Use TTS
         if message.content.startswith("say "):
             channel = self.voice.find_channel_by_user(message.author)
             if channel is not None:
-                voice_client = await self.voice.get_voice_client_for_channel(channel)
-                self.voice.play_tts(voice_client, message.content[3:])
-                return ""
+                if len(message.content) <= int(self.config.get("TTS_MAX_CHARS")):
+                    voice_client = await self.voice.get_voice_client_for_channel(channel)
+                    await self.voice.play_tts(voice_client, message.content[3:])
+                    return ""
+                else:
+                    return "Your message is too big."
             else:
                 return "You're not connected to any voice channels"
 
         return "Sorry, Max hasn't taught me how to answer to private messages yet."
+
+    # @event
+    async def on_voice_state_update(self, member, before, after):
+        print("STATE for member "+member.display_name+" Before: "+str(before))
+        print("STATE for member "+member.display_name+" After: "+str(after))
 
     async def on_ready(self):
         print('Logged in as')
@@ -91,7 +90,17 @@ class OnyxBot(discord.Client):
         print(bot.user.id)
         print('------')
 
+    def read_config(self):
+        with open("config.yml", "r") as file:
+            lines = [line.lstrip().rstrip() for line in file]
+            for line in lines:
+                conf = line.split(":", 1)
+                key = conf[0]
+                value = conf[1].split("#", 1)
+                self.config[key] = value[0].lstrip().rstrip()
+        print("Configuration loaded.")
+        print(self.config)
 
-read_config()
+
 bot = OnyxBot()
-bot.run(config.get("ACCESS_TOKEN"))
+bot.run(bot.config.get("ACCESS_TOKEN"))

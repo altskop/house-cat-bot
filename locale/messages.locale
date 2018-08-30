@@ -18,3 +18,5 @@ no u
 [WHAT-YOU-WANT]
 {0.author.mention} %HEY
 {0.author.mention} what do you %WANT
+
+[GREETINGS]
