@@ -31,7 +31,7 @@ class Voice:
 
     async def play_tts(self, client, text):
         while client.is_playing() and client.is_connected():
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.1)
 
         if client.is_connected():
             tts = gTTS(text=text, lang='en')

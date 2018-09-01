@@ -47,6 +47,11 @@ class DBHandler:
             self.get_entry(conn, table, key, value)
             self.update_entry(conn, table, key, value, column, new_value)
 
+    def get_boolean(self, table, column, key, value):
+        conn = self.get_conn()
+        with conn:
+            return self.str2bool(self.get_entry(conn, table, key, value)[column])
+
     def get_value_by_key(self, table, column, key, value):
         conn = self.get_conn()
         with conn:
@@ -91,7 +96,7 @@ class DBHandler:
         return d
 
     def str2bool(self, v):
-        return v.lower().lstrip() in ("true", "t", "1")
+        return str(v).lower().lstrip() in ("true", "t", "1")
 
     def current_time(self):
         return int(round(time.time() * 1000))

@@ -90,7 +90,7 @@ class OnyxBot(discord.Client):
         if self.voice.is_in_voice_in_guild(member.guild):
             if after.channel is not None:
                 if self.voice.is_in_voice_channel(after.channel):
-                    if self.db.get_value_by_key("guilds", "welcome_voice", "guildid", member.guild.id) == "true":
+                    if self.db.get_boolean("guilds", "welcome_voice", "guildid", member.guild.id):
                         if not self.db.is_in_timeframe("users", "last_seen", "userid", member.id, int(self.config.get("GREETING_TIMEOUT"))):
                             name = self.db.get_value_by_key("users", "pref_name", "userid", member.id)
                             if name is None:
