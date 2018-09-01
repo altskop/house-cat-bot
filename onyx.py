@@ -1,7 +1,9 @@
 import discord
 import response_builder as resp
-# import database_handler
+import database_handler
 import voice as vc
+import asyncio
+import random
 
 
 class OnyxBot(discord.Client):
@@ -10,6 +12,7 @@ class OnyxBot(discord.Client):
         super().__init__(*args, **kwargs)
         self.config = {}
         self.read_config()
+        self.db = database_handler.DBHandler("db/discord_data.db")
         self.responseBuilder = resp.ResponseBuilder(self.config)
         self.voice = vc.Voice(self)
 
@@ -32,8 +35,6 @@ class OnyxBot(discord.Client):
 
     # If the message is in a public server
     async def handle_public_message(self, message):
-
-        #print(message.mentions)
 
         if message.content.startswith("&"):
             return await self.handle_command(message)
@@ -76,19 +77,34 @@ class OnyxBot(discord.Client):
                     return "Your message is too big."
             else:
                 return "You're not connected to any voice channels"
+        elif message.content.startswith("call me "):
+            return self.call_me(message.author.id, message.content[8:])
 
         return "Sorry, Max hasn't taught me how to answer to private messages yet."
 
     # @event
     async def on_voice_state_update(self, member, before, after):
-        print("STATE for member "+member.display_name+" Before: "+str(before))
-        print("STATE for member "+member.display_name+" After: "+str(after))
+        if member == bot.user:
+            return
 
-    async def on_ready(self):
-        print('Logged in as')
-        print(bot.user.name)
-        print(bot.user.id)
-        print('------')
+        if self.voice.is_in_voice_in_guild(member.guild):
+            if after.channel is not None:
+                if self.voice.is_in_voice_channel(after.channel):
+                    if self.db.get_value_by_key("guilds", "welcome_voice", "guildid", member.guild.id) == "true":
+                        if not self.db.is_in_timeframe("users", "last_seen", "userid", member.id, int(self.config.get("GREETING_TIMEOUT"))):
+                            name = self.db.get_value_by_key("users", "pref_name", "userid", member.id)
+                            if name is None:
+                                name = member.display_name
+                            else:
+                                name = random.choice(name.split(";"))
+                            asyncio.sleep(2)
+                            voice_client = await self.voice.get_voice_client_for_channel(after.channel)
+                            msg = self.responseBuilder.get_response("GREETINGS") + ", " + name
+                            await self.voice.play_tts(voice_client, msg)
+
+    def call_me(self, id, text):
+        self.db.get_and_update("users", "userid", id, "pref_name", text)
+        return "Okay, I'll call you that from now on."
 
     def read_config(self):
         with open("config.yml", "r") as file:
@@ -100,6 +116,12 @@ class OnyxBot(discord.Client):
                 self.config[key] = value[0].lstrip().rstrip()
         print("Configuration loaded.")
         print(self.config)
+
+    async def on_ready(self):
+        print('Logged in as')
+        print(bot.user.name)
+        print(bot.user.id)
+        print('------')
 
 
 bot = OnyxBot()

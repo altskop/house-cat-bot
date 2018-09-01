@@ -31,7 +31,6 @@ class Voice:
 
     async def play_tts(self, client, text):
         while client.is_playing() and client.is_connected():
-            print("waiting....")
             await asyncio.sleep(1)
 
         if client.is_connected():
@@ -48,6 +47,19 @@ class Voice:
                 if user in voice_channel.members:
                     return voice_channel
         return None
+
+    def is_in_voice_in_guild(self, guild) -> bool:
+        for client in self.voice_clients:
+            if client.channel.guild == guild:
+                return True
+        return False
+
+    def is_in_voice_channel(self, channel) -> bool:
+        for client in self.voice_clients:
+            if client.channel.guild == channel.guild:
+                if client.channel == channel:
+                    return True
+        return False
 
     async def get_voice_client_for_channel(self, channel):
         for client in self.voice_clients:

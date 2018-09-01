@@ -2,3 +2,4 @@ ACCESS_TOKEN: exampletoken # Access token for the bot to login with
 CREATOR_ID: 123456789 # Your account discord ID
 TTS_MAX_CHARS: 280 # The TTS queries will be limited to this amount of characters
 VOICE_SPEED: 1.0 # How fast should the TTS track be, where 1.0 is normal.
+GREETING_TIMEOUT: 45 # How long in minutes should the bot wait before being able to greet a person again
