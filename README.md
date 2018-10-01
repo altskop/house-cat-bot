@@ -9,11 +9,11 @@ The bot should be relatively easy to reconfigure and reprogram should you want t
 
 ## Core Features:
 - The bot is able to monitor discord messages (in either public channels it's connected to, and DM channels), parse them, compare them to pre-written models, and generate new responses.
+- It's able to connect to voice channels on demand and use TTS to talk. It can also greet members that joined a voice channel it's already in.
 
 At this point there are no other functioning features.
 
 ## Planned Core Features
-- TTS in voice channels
 - Larger sets of message and response models to increase the impact of the bot
 - TBD
 
