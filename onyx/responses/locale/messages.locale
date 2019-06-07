@@ -8,6 +8,25 @@ You know, {0.author.mention}, %MAXNAME went through all the trouble of coding a 
 [IF-INSULTED]
 no u
 
+[IM-SO-TIRED]
+%IM %SO %TIRED
+%IM %SO %TIRED %MUCH
+%IM %TIRED
+%IM %TIRED %MUCH
+%GUYS %IM %SO %TIRED
+%GUYS %IM %SO %TIRED %MUCH
+%GUYS %IM %TIRED
+%GUYS %IM %TIRED %MUCH
+%IM %SO %TIRED %GUYS
+%IM %SO %TIRED %MUCH %GUYS
+%IM %TIRED %GUYS
+%IM %TIRED %MUCH %GUYS
+
+[CLEANING-HALLWAY]
+What, did you try cleaning your hallway?
+What, you tried cleaning your hallway?
+What, you tried cleaning your hallway or something?
+
 [INSULT]
 %INSULT
 %YOU %INSULT

@@ -15,6 +15,11 @@ At this point there are no other functioning features.
 
 ## Planned Core Features
 - Larger sets of message and response models to increase the impact of the bot
+    - add functionality such as !thesaurizethis, !poll, !set_away_message, /roll, 
+- Allow bot to listen to voice (perhaps respond in some ways or record?). For example, it could be controlled in voice to call Rhythm or smth
+- Add soundboard functionality
+- Meme-generation
+- Add a web interface to change bot's parameters (such as voice etc.)
 - TBD
 
 This list will be updated once I figure out what I want this bot to do. I haven't really given it a thought and just rolled with everything I could think of.
@@ -22,8 +27,8 @@ This list will be updated once I figure out what I want this bot to do. I haven'
 ## Project Structure
 Currently there are three main modules in the project:
 - [onyx.py](onyx.py) : this file determines behaviour of OnyxBot. It is responsible for setting it up and managing its during runtime. It will require a "config" file in the directory to run (see "config.example" for details)
-- [response_builder.py](response_builder.py) : this package contains the logic for reading and generating responses. The message models are defined in [locale/messages.locale](locale/messages.locale), and the word dictionary is populated from [locale/dictionary.locale](locale/dictionary.locale) 
-- [testing.py](testing.py) : this module is used to unit test the [response_builder.py](response_builder.py)
+- [response_builder.py](responses/response_builder.py) : this package contains the logic for reading and generating responses. The message models are defined in [locale/messages.locale](responses/locale/messages.locale), and the word dictionary is populated from [locale/dictionary.locale](responses/locale/dictionary.locale) 
+- [testing.py](tests/testing.py) : this module is used to unit test the [response_builder.py](responses/response_builder.py)
 
 ## Getting Started
 
@@ -59,7 +64,7 @@ You should be all set to start developing and running the project.
 
 ## Running the tests
 
-In order to run automated testing for the [response_builder.py](response_builder.py) (the module responsible for recognizing message patterns and generating replies), create your test cases in [testing.py](testing.py).
+In order to run automated testing for the [response_builder.py](responses/response_builder.py) (the module responsible for recognizing message patterns and generating replies), create your test cases in [testing.py](tests/testing.py).
 
 Some test cases are already present in package. An example below demonstrates how to create a test case:
 
@@ -69,9 +74,9 @@ test.unit_test_fits_template("INSULT", "u r good", False)
 
 Where `test` is a reference to **UnitTester** class, `unit_test_fits_template` is a method of **UnitTester** that tests `msg_fits_template` method of **ResponseBuilder**, `"INSULT"` is a message model tag to compare input to, `"u r good"` is the input, and `False` is the expected output of the method.
 
-If the input string matches the message model, the method will return `True`. Otherwise, it will return `False`. For more information on this, examine the documentation in [response_builder.py](response_builder.py).
+If the input string matches the message model, the method will return `True`. Otherwise, it will return `False`. For more information on this, examine the documentation in [response_builder.py](responses/response_builder.py).
 
-Example output after running the [testing.py](testing.py):
+Example output after running the [testing.py](tests/testing.py):
 
 ```---------------------------------------------
 TOTAL TESTS RAN: 17

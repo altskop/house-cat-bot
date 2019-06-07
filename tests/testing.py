@@ -1,4 +1,4 @@
-import response_builder
+from responses import response_builder
 
 
 class UnitTester():
