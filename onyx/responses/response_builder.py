@@ -37,8 +37,8 @@ class ResponseBuilder:
             if len(remain) == 0:
                 return False
             template_word_list = re.sub("[^\S]", " ", template).split()
-            print(template_word_list)
-            print("len is %d" % len(template_word_list))
+            # print(template_word_list)
+            # print("len is %d" % len(template_word_list))
             template_len = len(template_word_list)
             for i, word in enumerate(template_word_list):
                 found = False
@@ -46,21 +46,21 @@ class ResponseBuilder:
                     for (dict_word) in self.dictionary.get(word[1:]):
                         word_pattern = re.compile("^\W*("+dict_word.lower()+")")
                         if word_pattern.match(remain):
-                            print("Found occurence of "+word+" in \""+remain+"\"")
+                            # print("Found occurence of "+word+" in \""+remain+"\"")
                             remain = re.sub(word_pattern, '', remain)
                             found = True
                             break
                 else:
                     word_pattern = re.compile("^\W*(" + word.lower() + ")")
                     if word_pattern.match(remain):
-                        print("Found occurence of " + word + " in \"" + remain + "\"")
+                        # print("Found occurence of " + word + " in \"" + remain + "\"")
                         remain = re.sub(word_pattern, '', remain)
                         found = True
                 if not found:
                     # Didn't find this word?
                     continue
-                print("new string " + remain)
-                print("i %d" % i)
+                # print("new string " + remain)
+                # print("i %d" % i)
                 remain = remain.strip()
                 if len(remain) == 0 and i == (template_len - 1):
                     return True

@@ -15,7 +15,7 @@ RUN apk --update add --no-cache \
     zlib-dev \
     freetype-dev
 
-RUN pip install -U "discord.py[voice]" gtts pillow
+RUN pip install -U "discord.py[voice]" gtts pillow aenum
 
 FROM python:3.6-alpine
 

@@ -5,6 +5,7 @@ from util import database_handler
 from voice import voice as vc
 from meme_generator.meme_gen_cog import MemeGeneratorCog
 from responses.response_cog import ResponseCog
+from games.game_cog import GameCog
 import asyncio
 import random
 import os
@@ -139,5 +140,6 @@ class OnyxBot(commands.Bot):
 bot = OnyxBot(command_prefix='$')
 bot.add_cog(MemeGeneratorCog(bot))
 bot.add_cog(ResponseCog(bot))
+bot.add_cog(GameCog(bot))
 bot.run(bot.config.get("ACCESS_TOKEN"))
 
