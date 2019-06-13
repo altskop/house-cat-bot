@@ -18,14 +18,14 @@ beats = {
 
 
 class RPSEmoji(Enum):
-    rock = ":large_blue_diamond:"
+    rock = ":white_medium_square:"
     paper = ":page_facing_up:"
     scissors = ":scissors:"
 
 
 class RockPaperScissorsSession(Session):
-    def __init__(self, cog, ctx, *args):
-        Session.__init__(self, cog, ctx, args)
+    def __init__(self, cog, ctx, args):
+        Session.__init__(self, cog, ctx, args, life_time=120)
         self.players = []
         self.player_choices = {}
 
@@ -60,26 +60,22 @@ class RockPaperScissorsSession(Session):
                 raise ValueError("Couldn't send a DM to {0}.".format(player.mention))
 
     async def on_private_message(self, message):
-        if message.author in self.players:
-            try:
-                choice = Choice(message.content.lower())
-                if self.player_choices.get(choice) is None:
-                    self.player_choices[choice] = []
-                self.player_choices[choice].append(message.author)
-                # After the player made their move, remove them from listening
-                self.players.remove(message.author)
-                await message.channel.send("You played {0}".format(choice.value))
-                if len(self.players) == 0:
-                    await self._announce_victor()
-            except KeyError as e:
-                print(e)
-                await message.author.send("Invalid input, please try again.")
+        try:
+            choice = Choice(message.content.lower())
+            if self.player_choices.get(choice) is None:
+                self.player_choices[choice] = []
+            self.player_choices[choice].append(message.author)
+            await message.channel.send("You played {0}".format(choice.value))
+            # After the player made their move, remove them from listening
+            self.players.remove(message.author)
+            if len(self.players) == 0:
+                await self._announce_victor()
+        except KeyError as e:
+            print(e)
+            await message.author.send("Invalid input, please try again.")
 
     async def _announce_victor(self):
-        text = ""
-        for choice, player_list in self.player_choices.items():
-            for player in player_list:
-                text += "{0} plays {1}{2}!\n".format(player.mention, choice.value, RPSEmoji[choice.value].value)
+        text = self._list_player_choices()
         choice_list = list(self.player_choices.keys())
         if len(choice_list) == 2:
             # Can define a victor
@@ -92,12 +88,33 @@ class RockPaperScissorsSession(Session):
                 verb = "wins"
             else:
                 verb = "win"
-            text += "**{0} {1} the game!**".format(victors_str, verb)
+            text += "\n**{0} {1} the game!**".format(victors_str, verb)
         else:
             # it's a Tie
-            text += "**It's a tie!**"
+            text += "\n**It's a tie!**"
         await self.ctx.send(text)
         self.stop()
 
+    def is_private_message_expected(self, message):
+        if message.author in self.players:
+            return True
+        return False
+
+    def is_public_message_expected(self, message):
+        return False
+
+    async def on_expiration(self):
+        text = self._list_player_choices()
+        for player in self.players:
+            text += "> {0} has not responded in due time.\n".format(player.mention)
+        await self.primary_channel.send(text)
+
     async def on_public_message(self, message):
         pass
+
+    def _list_player_choices(self) -> str:
+        text = ""
+        for choice, player_list in self.player_choices.items():
+            for player in player_list:
+                text += "> {0} plays {1}{2}!\n".format(player.mention, choice.value, RPSEmoji[choice.value].value)
+        return text

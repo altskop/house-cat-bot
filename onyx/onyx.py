@@ -17,7 +17,7 @@ class OnyxBot(commands.Bot):
         super().__init__(*args, **kwargs)
         self.config = {}
         self.read_config()
-        self.db = database_handler.DBHandler("/storage/db/discord_data.db")
+        # self.db = database_handler.DBHandler("../storage/db/discord_data.db")
         self.responseBuilder = resp.ResponseBuilder()
         self.voice = vc.Voice(self)
 

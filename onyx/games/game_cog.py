@@ -2,10 +2,12 @@ import discord
 import discord.ext.commands as commands
 from .game_die import GameDie
 from .sessions.rock_paper_scissors import RockPaperScissorsSession
-import gc
+from .sessions.cards_against_humanity.cards_against_humanity import CardsAgainstHumanitySession
 
 games = {"rock-paper-scissors": RockPaperScissorsSession,
-         "rps": RockPaperScissorsSession}
+         "rps": RockPaperScissorsSession,
+         "cards-against-humanity": CardsAgainstHumanitySession,
+         "cah": CardsAgainstHumanitySession}
 
 
 class GameCog(commands.Cog):
@@ -22,7 +24,7 @@ class GameCog(commands.Cog):
     async def game(self, ctx, *args):
         try:
             game_id = args[0]
-            game = games[game_id](self, ctx, *args[1:])
+            game = games[game_id](self, ctx, list(args[1:]))
             await game.start()
         except KeyError:
             await ctx.send("No such game available.")
@@ -45,6 +47,14 @@ class GameCog(commands.Cog):
         self.game_sessions.remove(session)
         print("Session unsubscribed! Current list: ")
         print(self.game_sessions)
-        # gc.collect()
-        # refs = gc.get_referrers(session)
-        # print(refs)
+        # Debug statements below: making sure sessions don't leak memory
+        # obj = objgraph.by_type('games.sessions.rock_paper_scissors.RockPaperScissorsSession')
+        # print(len(obj))
+        # print(obj)
+
+    def is_session_in_channel(self, session_type, channel):
+        for session in self.game_sessions:
+            if type(session) == session_type:
+                if session.primary_channel == channel:
+                    return True
+        return False

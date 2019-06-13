@@ -28,7 +28,7 @@ class ResponseCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message(self, message):
-        chance_of_reaction = 0.02
+        chance_of_reaction = 0.015
         if random.random() < chance_of_reaction:
             await message.add_reaction("❤")
         if message.author == self.bot.user:
