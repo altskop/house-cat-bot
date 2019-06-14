@@ -1,4 +1,5 @@
 from util import database_handler
+import random
 
 
 class CahDb(database_handler.DBHandler):
@@ -7,6 +8,7 @@ class CahDb(database_handler.DBHandler):
         self.seed = seed
         self.black_index = 0
         self.white_index = 0
+        self.discard_pile = []
 
     def initialize_db(self):
         pass
@@ -22,6 +24,19 @@ class CahDb(database_handler.DBHandler):
             return c.fetchone()
 
     def get_white_cards(self, amount):
+        cards = []
+        cards_needed = amount - len(self.discard_pile)
+        if cards_needed > 0:
+            cards.extend(self.discard_pile)
+            self.discard_pile = []
+            cards.extend(self._get_white_cards(cards_needed))
+        else:
+            cards.extend(self.discard_pile[:cards_needed])
+            self.discard_pile = self.discard_pile[cards_needed:]
+        random.shuffle(cards)
+        return cards
+
+    def _get_white_cards(self, amount):
         conn = self.conn
         with conn:
             c = conn.cursor()
@@ -31,3 +46,7 @@ class CahDb(database_handler.DBHandler):
             self.white_index += amount
             result = c.fetchall()
             return [card['text'] for card in result]
+
+    def discard(self, cards: list):
+        self.discard_pile.extend(cards)
+
