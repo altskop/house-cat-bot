@@ -272,9 +272,9 @@ class CardsAgainstHumanitySession(Session):
                 if len(played_card['cards']) < self.black_card['pick']:
                     played_card['cards'].append(card)
                     if len(played_card['cards']) == self.black_card['pick']:
-                        self.round_players.remove(player)
                         card_text = "\"" + "\" | \"".join(played_card['cards']) + "\""
                         await player.send("You played {0}".format(card_text))
+                        self.round_players.remove(player)
                     else:
                         await player.send("You played {0}".format(card))
                     return

@@ -19,8 +19,11 @@ class MemeGeneratorCog(commands.Cog):
         await self.generate_meme(ctx, id, text)
 
     async def list(self, ctx):
-        folders = ", ".join(list(os.listdir("/storage/memes/templates")))
-        await ctx.send(folders)
+        folders = sorted(list(os.listdir("/storage/memes/templates")))
+        embed = discord.Embed(title="List of all Meme Templates", description="", color=0x00ff00)
+        for folder in folders:
+            embed.add_field(name=folder, value=folder, inline=True)
+        await ctx.send(embed=embed)
 
     @commands.command(name="mock-text")
     async def mock_text(self, ctx, text=None):
