@@ -39,20 +39,25 @@ class RockPaperScissorsSession(Session):
             raise ValueError("You can't challenge yourself.")
 
         self.players.append(self.ctx.message.author)
-        self.players.extend(self.ctx.message.mentions)
+        for player in self.ctx.message.mentions:
+            if player not in self.players:
+                self.players.append(player)
         await self._issue_challenge()
 
     async def _issue_challenge(self):
         challenge_text = "{0} challenges {1} to a game of Rock-Paper-Scissors! " \
                          "Contenders, please check your DMs to make your move." \
-            .format(self.ctx.message.author.mention, ", ".join([member.mention for member in self.ctx.message.mentions]))
+            .format(self.ctx.message.author.mention,
+                    ", ".join([player.mention for player in self.players if player != self.ctx.message.author]))
         await self.ctx.send(challenge_text)
-        instruction_text = "To make your move in Rock Paper Scissors game, " \
-                           "reply with a number of your choice or its value " \
+        instruction_text = "{0} challenges you to a game of Rock-Paper-Scissors in **{1}** server, **{2}** channel!\n" \
+                           "To make your move, reply with a number of your choice or its value " \
                            "(for example, your reply could be either \"1\" or \"Rock\" to play a Rock):\n" \
-                           "1. Rock {0}\n" \
-                           "2. Paper {1} \n" \
-                           "3. Scissors {2}".format(RPSEmoji.rock.value, RPSEmoji.paper.value, RPSEmoji.scissors.value)
+                           "1. Rock {3}\n" \
+                           "2. Paper {4} \n" \
+                           "3. Scissors {5}".format(self.ctx.message.author.mention, self.ctx.guild.name,
+                                                    self.ctx.channel.name,
+                                                    RPSEmoji.rock.value, RPSEmoji.paper.value, RPSEmoji.scissors.value)
         for player in self.players:
             try:
                 await player.send(instruction_text)
