@@ -1,37 +1,45 @@
 import discord
-import response_builder as resp
-import database_handler
-import voice as vc
+import discord.ext.commands as commands
+from responses import response_builder as resp
+from util import database_handler
+from voice import voice as vc
+from meme_generator.meme_gen_cog import MemeGeneratorCog
+from responses.response_cog import ResponseCog
+from games.game_cog import GameCog
 import asyncio
 import random
+import os
 
 
-class OnyxBot(discord.Client):
+class OnyxBot(commands.Bot):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = {}
         self.read_config()
-        self.db = database_handler.DBHandler("db/discord_data.db")
-        self.responseBuilder = resp.ResponseBuilder(self.config)
+        # self.db = database_handler.DBHandler("../storage/db/discord_data.db")
+        self.responseBuilder = resp.ResponseBuilder()
         self.voice = vc.Voice(self)
 
-    # @event
-    # What to do when we receive a message
-    async def on_message(self, message):
-        # we do not want the bot to parse itself
-        if message.author == bot.user:
-            return
-
-        print(message.content)
-
-        if isinstance(message.channel, discord.DMChannel):
-            msg = await self.handle_private_message(message)
-        else:
-            msg = await self.handle_public_message(message)
-        if msg != "":
-            print("Replying: "+msg)
-            await message.channel.send(msg.format(message))
+    # # @event
+    # # What to do when we receive a message
+    # async def on_message(self, message):
+    #     # we do not want the bot to parse itself
+    #     if message.author == bot.user:
+    #         return
+    #
+    #     print(message.content)
+    #
+    #     if isinstance(message.channel, discord.DMChannel):
+    #         msg = await self.handle_private_message(message)
+    #     else:
+    #         msg = await self.handle_public_message(message)
+    #     if type(msg)==str:
+    #         if msg != "":
+    #             print("Replying: "+msg)
+    #             await message.channel.send(msg.format(message))
+    #     else:
+    #         await message.channel.send(file=discord.File(msg, "meme.png"))
 
     # If the message is in a public server
     async def handle_public_message(self, message):
@@ -60,6 +68,11 @@ class OnyxBot(discord.Client):
         if message.content == "&disconnect":
             # leave voice channel
             await self.voice.disconnect_voice_from_guild(message.guild)
+        elif message.content.startswith("&meme its-retarded"):
+            text = [message.content[len("&meme its-retarded"):]]
+            gen = generator.MemeGenerator("its-retarded", text)
+            image = gen.add_text_to_image()
+            return image
         return ""
 
     # If the message was a DM
@@ -124,5 +137,9 @@ class OnyxBot(discord.Client):
         print('------')
 
 
-bot = OnyxBot()
+bot = OnyxBot(command_prefix='$')
+bot.add_cog(MemeGeneratorCog(bot))
+bot.add_cog(ResponseCog(bot))
+bot.add_cog(GameCog(bot))
 bot.run(bot.config.get("ACCESS_TOKEN"))
+

@@ -1,10 +1,10 @@
 import re
 import random
+import string
 
 
 class ResponseBuilder:
-    def __init__(self, config: dict):
-        self.config = config
+    def __init__(self):
         self.dictionary = self.read_templates("dictionary.locale")
         self.message_templates = self.read_templates("messages.locale")
 
@@ -31,31 +31,38 @@ class ResponseBuilder:
         return new_text
 
     def msg_fits_template(self, key, msg: str) -> bool:
-
-        any_pattern = re.compile("[a-zA-z]")
-
         for template in self.message_templates.get(key):
-            remain = msg
+            remain = msg.lower()
+            remain = remain.translate(str.maketrans('', '', string.punctuation))
+            if len(remain) == 0:
+                return False
             template_word_list = re.sub("[^\S]", " ", template).split()
-            for (word) in template_word_list:
-                if word[:1] == "%":
+            # print(template_word_list)
+            # print("len is %d" % len(template_word_list))
+            template_len = len(template_word_list)
+            for i, word in enumerate(template_word_list):
+                found = False
+                if word[0] == "%":
                     for (dict_word) in self.dictionary.get(word[1:]):
-                        word_pattern = re.compile("^\W*("+dict_word+")")
+                        word_pattern = re.compile("^\W*("+dict_word.lower()+")")
                         if word_pattern.match(remain):
-                            #print("Found occurence of "+word+" in \""+remain+"\"")
+                            # print("Found occurence of "+word+" in \""+remain+"\"")
                             remain = re.sub(word_pattern, '', remain)
-                            remain = self.cleanup_spaces(remain)
-                            #print("new string "+remain)
-                    if not any_pattern.search(remain):
-                        return True
+                            found = True
+                            break
                 else:
-                    word_pattern = re.compile("^\W*(" + word + ")")
+                    word_pattern = re.compile("^\W*(" + word.lower() + ")")
                     if word_pattern.match(remain):
-                        #print("Found occurence of " + word + " in \"" + remain + "\"")
+                        # print("Found occurence of " + word + " in \"" + remain + "\"")
                         remain = re.sub(word_pattern, '', remain)
-                        remain = self.cleanup_spaces(remain)
-                        #print("new string " + remain)
-                if not any_pattern.search(remain):
+                        found = True
+                if not found:
+                    # Didn't find this word?
+                    continue
+                # print("new string " + remain)
+                # print("i %d" % i)
+                remain = remain.strip()
+                if len(remain) == 0 and i == (template_len - 1):
                     return True
         return False
 
@@ -67,7 +74,7 @@ class ResponseBuilder:
     def read_templates(self, filename: str) -> dict:
         responses = {}
         tag_pattern = re.compile("\[[A-Z-?]+\]")
-        with open("locale/" + filename, "r") as file:
+        with open("responses/locale/" + filename, "r") as file:
             lines = [line.rstrip('\n') for line in file]
             current_tag = ""
             current_list = []

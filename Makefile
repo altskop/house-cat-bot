@@ -1,10 +1,8 @@
-.PHONY: build run
+.PHONY: storage
 
-build:
-	docker build -t onyx-bot .
-
-run:
-	docker volume create --name onyx-db
-	docker run -d -v onyx-db:/OnyxBot/db onyx-bot
-
-default: build run
+storage:
+	docker volume rm onyx-storage
+	docker container create --name dummy -v onyx-storage:/storage hello-world
+	docker volume create --name onyx-storage
+	docker cp storage/. dummy:/storage
+	docker rm dummy

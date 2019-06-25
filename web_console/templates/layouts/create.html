@@ -1,0 +1,40 @@
+<html>
+	<head>
+		<title>Create a Meme Template</title>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+		<script type="text/javascript" src="static/script.js" /></script>
+		<link rel="stylesheet" href="static/style.css" />
+	</head>
+	<body>
+
+		<h1>Create a Meme Template</h1>
+
+		<div id='stepOne'>
+			<h3>Step One</h3>
+			<div id="drop_zone">Drop files here</div>
+			<output id="list"></output>
+		</div>
+
+		<div id='stepTwo'>
+			<h3>Step Two</h3>
+			<p><b>Click and drag</b> to create fields in the order you want them to be used.</p>
+		</div>
+
+		<div id='stepThree'>
+			<h3>Step Three</h3>
+			<p>Template name:</p>
+			<input type="text" maxlength="24" id="template-name"><br>
+			<p>Font:</p>
+			<input type="radio" name="font" value="normal" checked> Normal<br>
+            <input type="radio" name="font" value="bold"> Bold<br>
+            <p><span color="ffffff" id="result"></span></p>
+			<input type='button' id='submit' value='Submit!' />
+			<input type='button' id='reset' value='Reset' /><br><br>
+		</div>
+
+		<img src='' id='image' class='clickable' />
+
+		<canvas id='canvas' class='clickable'></canvas>
+		<canvas id='drawCanvas' class='clickable'></canvas>
+	</body>
+</html>
