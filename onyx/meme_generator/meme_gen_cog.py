@@ -5,6 +5,11 @@ from . import generator
 import random
 
 
+def chunks(lst, max_size):
+    for i in range(0, len(lst), max_size):
+        yield lst[i:i+max_size]
+
+
 class MemeGeneratorCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -20,10 +25,13 @@ class MemeGeneratorCog(commands.Cog):
 
     async def list(self, ctx):
         folders = sorted(list(os.listdir("/storage/memes/templates")))
+        chunks_templates = list(chunks(folders, 24))
         embed = discord.Embed(title="List of all Meme Templates", description="", color=0x00ff00)
-        for folder in folders:
-            embed.add_field(name=folder, value=folder, inline=True)
-        await ctx.send(embed=embed)
+        for chunk in chunks_templates:
+            for template in chunk:
+                embed.add_field(name=template, value=template, inline=True)
+            await ctx.send(embed=embed)
+            embed = discord.Embed(title="", description="", color=0x00ff00)
 
     @commands.command(name="mock-text")
     async def mock_text(self, ctx, text=None):

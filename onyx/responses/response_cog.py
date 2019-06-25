@@ -2,23 +2,8 @@ import discord
 import discord.ext.commands as commands
 from .response_builder import ResponseBuilder
 from .poll import Poll
+from .thesaurus import thesaurus
 import random
-
-
-class Slapper(commands.Converter):
-    async def convert(self, ctx, argument):
-        members = ctx.message.mentions
-        if len(members) > 0:
-            for member in members:
-                argument = argument.replace(member.mention, '')
-                argument = argument.strip()
-            if len(argument) == 0:
-                argument = "just because"
-            to_slap = ", ".join([member.mention for member in members])
-        else:
-            member = random.choice(ctx.guild.members)
-            to_slap = member.mention
-        return '{0.author.mention} slapped {1} because \"*{2}*\"!'.format(ctx, to_slap, argument)
 
 
 class ResponseCog(commands.Cog):
@@ -28,7 +13,7 @@ class ResponseCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message(self, message):
-        chance_of_reaction = 0.015
+        chance_of_reaction = 0.01
         if random.random() < chance_of_reaction:
             await message.add_reaction("❤")
         if message.author == self.bot.user:
@@ -40,10 +25,6 @@ class ResponseCog(commands.Cog):
             text = self.response_builder.get_response("CLEANING-HALLWAY")
             await message.channel.send(text)
 
-    @commands.command(name="slap")
-    async def slap(self, ctx, *, response: Slapper):
-        await ctx.send(response)
-
     @commands.command(name="poll")
     async def poll(self, ctx, *args):
         try:
@@ -51,3 +32,10 @@ class ResponseCog(commands.Cog):
             await poll.poll()
         except (IndexError, ValueError) as e:
             await ctx.send(str(e))
+
+    @commands.command(name="thesaurizethis")
+    async def thesaurize(self, ctx, *args):
+        response = await thesaurus.convert(ctx)
+        if len(response) > 0:
+            embed = discord.Embed(title="", description=response, color=0x00ff00)
+            await ctx.send(embed=embed)
