@@ -7,6 +7,8 @@ MAX_WHITE_CARDS = 10
 MAX_PLAYERS = 10
 MAX_BLANK_CARD_LENGTH = 140  # Characters
 CARD_CZAR_EMOJI = ":crown:"
+LOCK_EMOJI = ":lock:"
+UNLOCK_EMOJI = ":unlock:"
 
 
 class CardsAgainstHumanitySession(Session):
@@ -18,6 +20,8 @@ class CardsAgainstHumanitySession(Session):
         self.host = self.ctx.message.author
         self.dealer = CahDb(self.session_seed)
         self.black_card = None  # Current black card in play
+        self.can_be_joined = True
+        self.point_limit = None
         self.czar = None
         self.played_cards = []
         self.round_players = []
@@ -65,50 +69,64 @@ class CardsAgainstHumanitySession(Session):
             except (ValueError, IndexError):
                 await message.author.send("Invalid input, please try again.")
         elif player == self.czar:
-            await message.author.send("You're the Card Czar! You can't both play and judge in one round. That'd be too easy :)")
+            await message.author.send("You're the Card Czar! You can't both play and judge in the same round. That'd be too easy :)")
 
     async def on_public_message(self, message):
-        if message.content == "cah join":
-            if message.author not in self.players.keys():
-                if len(self.players.keys()) < MAX_PLAYERS:
-                    self._add_player(message.author)
-                    text = "{0} joins!\n".format(message.author.mention)
-                    text += self._list_players()
-                    await self.primary_channel.send(text)
-                else:
-                    await self.primary_channel.send("There are already too many players in the game.")
-        elif message.content == "cah start":
-            if message.author == self.host:
+        if message.content == "cah leave":
+            if message.author in self.players:
+                await self._remove_player(message.author)
+                return
+
+        if message.author == self.host:
+            if message.content == "cah start":
                 if len(self.players.keys()) > 2:
                     await self.primary_channel.send("Let the games begin!")
                     await self._game_round()
                 else:
                     await self.primary_channel.send("Not enough players to start.")
 
-        elif message.content == "cah leave":
-            if message.author in self.players:
-                await self._remove_player(message.author)
+            elif message.content == "cah end":
+                text = "{0} ends the game. Final Scores:\n".format(self.host.mention)
+                text += self._list_players()
+                await self.primary_channel.send(text)
+                self.stop()
 
-        elif message.content == "cah end":
-            text = "{0} ends the game. Final Scores:\n".format(self.host.mention)
-            text += self._list_players()
-            await self.primary_channel.send(text)
-            self.stop()
+            elif message.content.startswith("cah kick "):
+                if len(message.mentions) > 0:
+                    player_to_kick = message.mentions[0]
+                    await self._remove_player(player_to_kick, kick=True)
 
-        elif message.content.startswith("cah kick "):
-            if len(message.mentions) > 0 and message.author == self.host:
-                player_to_kick = message.mentions[0]
-                await self._remove_player(player_to_kick, kick=True)
+            elif message.content.startswith("cah lock"):
+                if self.can_be_joined:
+                    self.can_be_joined = False
+                    await self.primary_channel.send("{0} The game has been locked, nobody else can join.".format(LOCK_EMOJI))
 
-        elif message.content.startswith("cah host "):
-            if len(message.mentions) == 1 and message.author == self.host:
-                new_host = message.mentions[0]
-                if new_host in self.players:
-                    if new_host != self.host:
-                        self.host = new_host
-                        await self.primary_channel.send("{0} is the new game host!".format(new_host.mention))
-                else:
-                    await self.primary_channel.send("{0} is not in the game.".format(new_host.mention))
+            elif message.content.startswith("cah unlock"):
+                if not self.can_be_joined:
+                    self.can_be_joined = True
+                    await self.primary_channel.send("{0} The game has been unlocked! Quick,"
+                                                    " join before it's too late!".format(UNLOCK_EMOJI))
+
+            elif message.content.startswith("cah limit "):
+                try:
+                    number = int(message.content.replace("cah limit ", ""))
+                    if number <= self._current_leader()['points']:
+                        await self.primary_channel.send("Point limit can't be less or equal to the current highscore.")
+                    else:
+                        self.point_limit = number
+                        await self.primary_channel.send("New points limit is {0}!".format(number))
+                except ValueError:
+                    await self.primary_channel.send("Invalid input, please try again")
+
+            elif message.content.startswith("cah host "):
+                if len(message.mentions) == 1:
+                    new_host = message.mentions[0]
+                    if new_host in self.players:
+                        if new_host != self.host:
+                            self.host = new_host
+                            await self.primary_channel.send("{0} is the new game host!".format(new_host.mention))
+                    else:
+                        await self.primary_channel.send("{0} is not in the game.".format(new_host.mention))
 
         elif message.author == self.czar:
             if len(self.round_players) == 0:
@@ -119,6 +137,20 @@ class CardsAgainstHumanitySession(Session):
                     pass
                 except IndexError:
                     await self.primary_channel.send("Invalid input, please try again")
+
+        else:
+            if message.content == "cah join":
+                if message.author not in self.players.keys():
+                    if self.can_be_joined:
+                        if len(self.players.keys()) < MAX_PLAYERS:
+                            self._add_player(message.author)
+                            text = "{0} joins!\n".format(message.author.mention)
+                            text += self._list_players()
+                            await self.primary_channel.send(text)
+                        else:
+                            await self.primary_channel.send("There are already too many players in the game.")
+                    else:
+                        await self.primary_channel.send("This game is locked.")
 
     async def on_expiration(self):
         text = "CAH session has expired due to inactivity :(\n\nFinal Scores:\n"
@@ -149,13 +181,20 @@ class CardsAgainstHumanitySession(Session):
     async def _announce(self):
         text = "{0} is hosting a Cards Against Humanity game!\n" \
                "To join, type \"cah join\" in the channel.\n" \
-               "```When ready, the host can start the game by typing \"cah start\".\n" \
-               "If someone wants to leave during the game, they can do so by typing \"cah leave\".\n" \
+               "```" \
+               "Play cards by responding to the bot in DMs! " \
+               "If you'd like to play two cards or combinations of cards in the same round, they can gamble by"\
+               "betting 1 Awesome Point! To do so, send \"gamble\" to the bot in DM when it's your turn to play" \
+               " a card.\n" \
+               "If someone wants to leave during the game, they can do so by typing \"cah leave\".\n\n" \
+               "Host commands:\nWhen ready, the host can start the game by typing \"cah start\".\n" \
                "The host may end the game at any time by typing \"cah end\", " \
                "and kick players using \"cah kick @PLAYER\"." \
                "The host may also transfer the host priviliges by typing \"cah host @PLAYER\".\n" \
-               "If a player would like to play two cards or combinations in one round, they can gamble by" \
-               "betting 1 Awesome Point. To do that, send \"gamble\" to the bot in DM.```\n" \
+               "The host may also lock the game so that nobody else can join it by typing \"cah lock\". Similarly," \
+               "they can type \"cah unlock\" to reopen it again.\n" \
+               "Type in \"cah limit 5\" or any other number to end the game when somebody reaches the limit." \
+               "```\n" \
                "You will need at least 3 players in order to play.".format(self.host.mention)
         await self.primary_channel.send(text)
 
@@ -194,12 +233,21 @@ class CardsAgainstHumanitySession(Session):
                 text += "`{0}. {1}`\n".format(i, card_text)
             await self.primary_channel.send(text)
 
+    async def _end_game(self):
+        text = "**{0} wins the game!**".format(self._current_leader()['player'].mention)
+        await self.primary_channel.send(text)
+        self.stop()
+
     async def _round_results(self, winning_card):
         winner = winning_card['player']
         self.players[winner]['points'] += self.round_points
         text = "**{0} wins the round and gets {1} Awesome Points!**\n".format(winner.mention, self.round_points)
         text += self._list_players()
         await self.primary_channel.send(text)
+        if self.point_limit is not None:
+            if self._current_leader()['points'] >= self.point_limit:
+                await self._end_game()
+                return
         await self._game_round()
 
     async def _display_cards(self):
@@ -225,6 +273,12 @@ class CardsAgainstHumanitySession(Session):
             need_cards = MAX_WHITE_CARDS - len(value['cards'])
             value['cards'].extend(cards[offset:offset+need_cards])
             offset += need_cards
+        # for player, value in self.players.items():
+        #     if len(value['cards']) < 2:
+        #         text = "No more white cards remaining. Game over!\n"
+        #         text += self._list_players()
+        #         await self.primary_channel.send(text)
+        #         return
         await self._display_cards()
 
     async def _next_czar(self):
@@ -281,3 +335,11 @@ class CardsAgainstHumanitySession(Session):
         # new played card for the player
         self.played_cards.append({"player": player, "cards": []})
         await self._play_card(player, card)
+
+    def _current_leader(self):
+        leader = {"player": None, "points": 0}
+        for player, values in self.players.items():
+            if values['points'] > leader['points']:
+                leader['points'] = values['points']
+                leader['player'] = player
+        return leader
