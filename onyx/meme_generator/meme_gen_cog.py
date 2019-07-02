@@ -19,19 +19,19 @@ class MemeGeneratorCog(commands.Cog):
         if args[0].lower() == "list":
             await self.list(ctx)
             return
-        id = args[0]
+        id = args[0].lower()
         text = list(args[1:])
         await self.generate_meme(ctx, id, text)
 
     async def list(self, ctx):
         folders = sorted(list(os.listdir("/storage/memes/templates")))
         chunks_templates = list(chunks(folders, 24))
-        embed = discord.Embed(title="List of all Meme Templates", description="", color=0x00ff00)
+        embed = discord.Embed(title="List of all Meme Templates", description="", color=self.bot.color)
         for chunk in chunks_templates:
             for template in chunk:
                 embed.add_field(name=template, value=template, inline=True)
             await ctx.send(embed=embed)
-            embed = discord.Embed(title="", description="", color=0x00ff00)
+            embed = discord.Embed(title="", description="", color=self.bot.color)
 
     @commands.command(name="mock-text")
     async def mock_text(self, ctx, text=None):

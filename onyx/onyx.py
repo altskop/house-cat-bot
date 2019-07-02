@@ -16,6 +16,7 @@ class OnyxBot(commands.Bot):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = {}
+        self.color = 0xff9000
         self.read_config()
         # self.db = database_handler.DBHandler("../storage/db/discord_data.db")
         self.responseBuilder = resp.ResponseBuilder()

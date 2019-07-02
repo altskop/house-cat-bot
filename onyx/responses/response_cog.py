@@ -13,7 +13,7 @@ class ResponseCog(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def on_message(self, message):
-        chance_of_reaction = 0.01
+        chance_of_reaction = 0.006
         if random.random() < chance_of_reaction:
             await message.add_reaction("❤")
         if message.author == self.bot.user:
@@ -21,9 +21,9 @@ class ResponseCog(commands.Cog):
         if len(message.content) > 0:
             if message.content[0] == "$":
                 return
-        if self.response_builder.msg_fits_template("IM-SO-TIRED", message.content):
-            text = self.response_builder.get_response("CLEANING-HALLWAY")
-            await message.channel.send(text)
+        # if self.response_builder.msg_fits_template("IM-SO-TIRED", message.content):
+        #     text = self.response_builder.get_response("CLEANING-HALLWAY")
+        #     await message.channel.send(text)
 
     @commands.command(name="poll")
     async def poll(self, ctx, *args):
@@ -37,5 +37,5 @@ class ResponseCog(commands.Cog):
     async def thesaurize(self, ctx, *args):
         response = await thesaurus.convert(ctx)
         if len(response) > 0:
-            embed = discord.Embed(title="", description=response, color=0x00ff00)
+            embed = discord.Embed(title="", description=response, color=self.bot.color)
             await ctx.send(embed=embed)
