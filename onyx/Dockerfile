@@ -33,4 +33,4 @@ RUN apk --update add --no-cache \
     bash \
     sqlite
 
-CMD [ "python", "-u", "./onyx.py" ]
+CMD [ "python", "-u", "./house_cat.py" ]

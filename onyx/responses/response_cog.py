@@ -5,6 +5,7 @@ from .poll import Poll
 from .thesaurus import thesaurus
 from . import magic8ball
 from util import utils
+from util import logger
 import random
 
 
@@ -17,7 +18,10 @@ class ResponseCog(commands.Cog):
     async def on_message(self, message):
         if len(message.content) > 0:
             if message.content[0] == "$":
+                logger.info(message, message.content)
                 return
+            else:
+                logger.debug(message, message.content)
         chance_of_reaction = 0.006
         if random.random() < chance_of_reaction:
             await message.add_reaction("❤")
