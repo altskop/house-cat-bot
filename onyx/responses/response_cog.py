@@ -50,9 +50,9 @@ class ResponseCog(commands.Cog):
 
     @commands.command(name="stats")
     async def stats(self, ctx, *args):
-        if self.bot.is_owner(ctx.author):
+        if await self.bot.is_owner(ctx.author):
             guilds = list(self.bot.guilds)
-            user_count = str(len(list(self.bot.get_all_members())))
+            user_count = str(len(self.bot.users))
             latency = str(self.bot.latency)
 
             embed = discord.Embed(title="Bot stats", description="", color=self.bot.color)
@@ -66,7 +66,7 @@ class ResponseCog(commands.Cog):
             embed = discord.Embed(title="Servers", description="", color=self.bot.color)
             for chunk in guilds_chunked:  # TODO move this to a class (Embed wrapper?)
                 for guild in chunk:
-                    value = "{0} channels, {1} users".format(len(guild.text_channels), len(guild.members))
+                    value = "{0} channels, {1} users, owned by {2}".format(len(guild.text_channels), len(guild.members), guild.owner.name)
                     embed.add_field(name=guild.name, value=value, inline=True)
                 await ctx.send(embed=embed)
                 embed = discord.Embed(title="", description="", color=self.bot.color)
