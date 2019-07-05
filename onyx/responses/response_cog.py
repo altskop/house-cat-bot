@@ -4,6 +4,7 @@ from .response_builder import ResponseBuilder
 from .poll import Poll
 from .thesaurus import thesaurus
 from . import magic8ball
+from util import utils
 import random
 
 
@@ -42,7 +43,31 @@ class ResponseCog(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command(name="magic8ball")
-    async def thesaurize(self, ctx, *args):
+    async def magic_8_ball(self, ctx, *args):
         response = magic8ball.get_response()
         embed = discord.Embed(title="", description=response['text'], color=response['color'])
         await ctx.send(embed=embed)
+
+    @commands.command(name="stats")
+    async def stats(self, ctx, *args):
+        if self.bot.is_owner(ctx.author):
+            guilds = list(self.bot.guilds)
+            user_count = str(len(list(self.bot.get_all_members())))
+            latency = str(self.bot.latency)
+
+            embed = discord.Embed(title="Bot stats", description="", color=self.bot.color)
+            embed.add_field(name="Number of guilds:", value=str(len(guilds)), inline=False)
+            embed.add_field(name="User Count:", value=user_count, inline=False)
+            embed.add_field(name="Latency:", value=latency, inline=False)
+
+            await ctx.send(embed=embed)
+
+            guilds_chunked = utils.chunks(guilds, 24)
+            embed = discord.Embed(title="Servers", description="", color=self.bot.color)
+            for chunk in guilds_chunked:  # TODO move this to a class (Embed wrapper?)
+                for guild in chunk:
+                    value = "{0} channels, {1} users".format(len(guild.text_channels), len(guild.members))
+                    embed.add_field(name=guild.name, value=value, inline=True)
+                await ctx.send(embed=embed)
+                embed = discord.Embed(title="", description="", color=self.bot.color)
+
