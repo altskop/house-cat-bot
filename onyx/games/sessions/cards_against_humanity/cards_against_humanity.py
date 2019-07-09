@@ -1,5 +1,4 @@
 from ..session import Session
-import discord
 import random
 from .cah_db import CahDb
 
@@ -15,10 +14,9 @@ class CardsAgainstHumanitySession(Session):
     def __init__(self, cog, ctx, args):
         Session.__init__(self, cog, ctx, args, life_time=600, one_per_channel=True)
         self.players = {}
-        self.session_seed = random.randrange(0, 100) + random.random()
         self.round = 0
         self.host = self.ctx.message.author
-        self.dealer = CahDb(self.session_seed)
+        self.dealer = CahDb()
         self.black_card = None  # Current black card in play
         self.can_be_joined = True
         self.point_limit = None
@@ -267,7 +265,6 @@ class CardsAgainstHumanitySession(Session):
         for player, value in self.players.items():
             white_cards += MAX_WHITE_CARDS - len(value['cards'])
         cards = self.dealer.get_white_cards(white_cards)
-        print("Got {0} cards from dealer".format(len(cards)))
         offset = 0
         for player, value in self.players.items():
             need_cards = MAX_WHITE_CARDS - len(value['cards'])

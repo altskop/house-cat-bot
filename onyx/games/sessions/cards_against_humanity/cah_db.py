@@ -3,9 +3,10 @@ import random
 
 
 class CahDb(database_handler.DBHandler):
-    def __init__(self, seed):
+    def __init__(self):
         database_handler.DBHandler.__init__(self, "/storage/db/cards-against-humanity.db")
-        self.seed = seed
+        self.seed = 0
+        self.new_seed()
         self.black_index = 0
         self.white_index = 0
         self.discard_pile = []
@@ -17,11 +18,19 @@ class CahDb(database_handler.DBHandler):
         conn = self.conn
         with conn:
             c = conn.cursor()
-            stmt = "select * from black_cards order by (substr(id * {0}, length(id)+2)) limit 1 offset {1};".\
-                format(self.seed, self.black_index)
+            stmt = "select * from black_cards order by (substr(id * {0}, length(id)+2)) limit 1 offset {1};"\
+                .format(self.seed, self.black_index)
             c.execute(stmt)
             self.black_index += 1
-            return c.fetchone()
+            result = c.fetchone()
+            if result is None:
+                self.new_seed()
+                self.black_index = 0
+                return self.get_next_black()
+            return result
+
+    def new_seed(self):
+        self.seed = random.randrange(0, 100) + random.random()
 
     def get_white_cards(self, amount):
         cards = []
@@ -44,8 +53,14 @@ class CahDb(database_handler.DBHandler):
                 format(self.seed, amount, self.white_index)
             c.execute(stmt)
             self.white_index += amount
-            result = c.fetchall()
-            return [card['text'] for card in result]
+            result = [card['text'] for card in c.fetchall()]
+            if len(result) < amount:
+                self.new_seed()
+                self.white_index = 0
+                extra_card_amount = amount - len(result)
+                extra_cards = self._get_white_cards(extra_card_amount)
+                result.extend(extra_cards)
+            return result
 
     def discard(self, cards: list):
         self.discard_pile.extend(cards)
