@@ -104,6 +104,7 @@ def validate_metadata(metadata):
 
 
 def new_template(name, img, metadata):
+    name = name.lower()
     path = os.path.normpath("../storage/memes/templates/" + name)
     os.mkdir(path)
     with open(path + "/template.png", "wb") as file:

@@ -1,9 +1,0 @@
-*.example
-example_*
-*.md
-venv
-Dockerfile
-Makefile
-testing.py
-*.mp3
-__pycache__
