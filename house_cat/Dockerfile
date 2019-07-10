@@ -21,11 +21,11 @@ FROM python:3.6-alpine
 
 COPY --from=base /usr/local/lib/python3.6/site-packages /usr/local/lib/python3.6/site-packages
 
-RUN mkdir /onyxbot
+RUN mkdir /house-cat-bot
 
-ADD . /onyxbot
+ADD . /house-cat-bot
 
-WORKDIR /onyxbot
+WORKDIR /house-cat-bot
 
 RUN apk --update add --no-cache \
     opus \

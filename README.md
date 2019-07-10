@@ -1,34 +1,24 @@
-# Onyx Bot Alpha
+# House Cat Bot
 
 ![python3.6](https://img.shields.io/badge/python-3.6-blue.svg) ![mit](https://img.shields.io/github/license/mashape/apistatus.svg)
 
-OnyxBot is a discord bot written in Python for my personal use. 
-It uses the [discord.py](https://github.com/Rapptz/discord.py/tree/rewrite) library written by Rapptz.
+House Cat is a multifunctional discord bot written in Python. 
+It utilizes the [discord.py](https://github.com/Rapptz/discord.py/tree/rewrite) library written by Rapptz.
 
-The bot should be relatively easy to reconfigure and reprogram should you want to have one for yourself.
+To add the bot to your server, please press [HERE](https://discordapp.com/api/oauth2/authorize?client_id=303023298743238656&permissions=36817984&scope=bot).
 
-## Core Features:
-- The bot is able to monitor discord messages (in either public channels it's connected to, and DM channels), parse them, compare them to pre-written models, and generate new responses.
-- It's able to connect to voice channels on demand and use TTS to talk. It can also greet members that joined a voice channel it's already in.
-
-At this point there are no other functioning features.
+## Features:
+- Meme Generation
+- Games (Rock-Paper-Scissors, Cards Against Humanity)
+- Polls
+- Dice rolls
+- Magic 8-Ball
+- Thesaurization of a message
 
 ## Planned Core Features
-- Larger sets of message and response models to increase the impact of the bot
-    - add functionality such as !thesaurizethis, !poll, !set_away_message, /roll, 
-- Allow bot to listen to voice (perhaps respond in some ways or record?). For example, it could be controlled in voice to call Rhythm or smth
-- Add soundboard functionality
-- Meme-generation
-- Add a web interface to change bot's parameters (such as voice etc.)
-- TBD
-
-This list will be updated once I figure out what I want this bot to do. I haven't really given it a thought and just rolled with everything I could think of.
-
-## Project Structure
-Currently there are three main modules in the project:
-- [onyx.py](onyx.py) : this file determines behaviour of OnyxBot. It is responsible for setting it up and managing its during runtime. It will require a "config" file in the directory to run (see "config.example" for details)
-- [response_builder.py](responses/response_builder.py) : this package contains the logic for reading and generating responses. The message models are defined in [locale/messages.locale](responses/locale/messages.locale), and the word dictionary is populated from [locale/dictionary.locale](responses/locale/dictionary.locale) 
-- [testing.py](tests/testing.py) : this module is used to unit test the [response_builder.py](responses/response_builder.py)
+- Allow bot to listen to voice (perhaps respond in some ways or record?). It could be controlled in voice to call Rhythm for example
+- Soundboard functionality
+- Add a fully-functional web dashboard
 
 ## Getting Started
 
@@ -41,7 +31,7 @@ The project requires **Python 3.6** to run.
 You will need to get the 1.0 version of [discord.py](https://github.com/Rapptz/discord.py/tree/rewrite) as a dependency:
 
 ```
-pip install -U discord.py[voice]
+pip install -U "discord.py[voice]"
 ```
 
 If 0.16.12 version is being installed, run the following command instead:
@@ -50,42 +40,11 @@ If 0.16.12 version is being installed, run the following command instead:
 pip install -U git+https://github.com/Rapptz/discord.py@rewrite#egg=discord.py[voice]
 ```
 
-### Installing
-
-To set up your development environment for this project, clone this repository first.
-
-```
-git clone https://github.com/altskop/OnyxBot.git
-```
-
-Open the folder as a project in PyCharm or any other IDE of your choice.
-
-You should be all set to start developing and running the project.
-
-## Running the tests
-
-In order to run automated testing for the [response_builder.py](responses/response_builder.py) (the module responsible for recognizing message patterns and generating replies), create your test cases in [testing.py](tests/testing.py).
-
-Some test cases are already present in package. An example below demonstrates how to create a test case:
-
-```
-test.unit_test_fits_template("INSULT", "u r good", False)
-``` 
-
-Where `test` is a reference to **UnitTester** class, `unit_test_fits_template` is a method of **UnitTester** that tests `msg_fits_template` method of **ResponseBuilder**, `"INSULT"` is a message model tag to compare input to, `"u r good"` is the input, and `False` is the expected output of the method.
-
-If the input string matches the message model, the method will return `True`. Otherwise, it will return `False`. For more information on this, examine the documentation in [response_builder.py](responses/response_builder.py).
-
-Example output after running the [testing.py](tests/testing.py):
-
-```---------------------------------------------
-TOTAL TESTS RAN: 17
-PASSED: 17  |  FAILED: 0
-```
-
 ## Deployment
 
-Will add support for containerization some time in the future. 
+Populate the `storage` folder with data that the bot will need access to (such as fonts, databases, meme templates etc.). Create a docker volume first using `make storage` in the root directory of the project. The volume will act as persistent storage for the bot. Deleting the volume will result in data loss. **Keep in mind that running the command again will remove the existing volume.**
+
+To build a docker image of House Cat bot, navigate to `house_cat` directory and run `make build`. You may also use `make run` to run the image after it was created, or `make start` to run it in detached mode.
 
 ## License
 
@@ -93,5 +52,5 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* Thank you Rapptz for the awesome library
-* Thank you Discord Team for the continuous API support and development
+* Thanks to Rapptz for the awesome library
+* Thanks to Discord Team for the continuous API support and development

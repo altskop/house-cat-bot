@@ -1,0 +1,4 @@
+*.md
+Dockerfile
+Makefile
+__pycache__
