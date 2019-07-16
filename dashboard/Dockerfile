@@ -15,7 +15,8 @@ RUN apk --update add --no-cache \
     zlib-dev \
     freetype-dev
 
-RUN pip install -U flask pillow jsonschema
+COPY requirements.txt /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
 FROM python:3.6-alpine
 

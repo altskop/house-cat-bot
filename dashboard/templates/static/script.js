@@ -116,9 +116,6 @@ $(document).ready(function() {
 //            };
             var data = JSON.stringify(jsonData);
             xhr.send(data);
-
-
-			// TODO submit request
 		}, 5);
 	});
 

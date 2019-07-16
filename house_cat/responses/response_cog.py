@@ -39,7 +39,7 @@ class ResponseCog(commands.Cog):
         except (IndexError, ValueError) as e:
             await ctx.send(str(e))
 
-    @commands.command(name="thesaurizethis")
+    @commands.command(name="thesaurize")
     async def thesaurize(self, ctx, *args):
         response = await thesaurus.convert(ctx)
         if len(response) > 0:

@@ -3,12 +3,7 @@ import discord.ext.commands as commands
 import os
 from . import generator
 import random
-
-
-# TODO move this to a class (Embed wrapper?)
-def chunks(lst, max_size):
-    for i in range(0, len(lst), max_size):
-        yield lst[i:i+max_size]
+from util import utils
 
 
 class MemeGeneratorCog(commands.Cog):
@@ -26,7 +21,7 @@ class MemeGeneratorCog(commands.Cog):
 
     async def list(self, ctx):
         folders = sorted(list(os.listdir("/storage/memes/templates")))
-        chunks_templates = list(chunks(folders, 24))
+        chunks_templates = list(utils.chunks(folders, 24))
         embed = discord.Embed(title="List of all Meme Templates", description="", color=self.bot.color)
         for chunk in chunks_templates:  # TODO move this to a class (Embed wrapper?)
             for template in chunk:
