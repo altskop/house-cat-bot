@@ -34,6 +34,7 @@ WORDS = [
   "but",
   "not",
   "what",
+  "why",
   "all",
   "were",
   "we",

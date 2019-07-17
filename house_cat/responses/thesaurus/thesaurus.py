@@ -41,6 +41,5 @@ async def get_synonym(word):
             if len(word_choices) > 0:
                 return random.choice(word_choices)
     except KeyError as e:
-        print(choices)
         print(e)
     return word
