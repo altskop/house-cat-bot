@@ -1,0 +1,29 @@
+<html>
+<head>
+    <title>House Cat - Multifunctional Discord Bot</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/discord.css') }}" />
+</head>
+<body>
+
+<div class="topnav">
+  <a class="bot-icon" href="#home"><img src="{{ url_for('static', filename='img/icon.png') }}" style="width:28px; height:28px" title="House Cat" alt="House Cat"></a>
+  <a href="#news">News</a>
+  <a href="#contact">Contact</a>
+  <a href="#about">Commands</a>
+    <div class="topnav-right">
+    {% if session['logged_in'] %}
+    <!-- Logged in -->
+        <a href="/logout" onclick="return confirm('Are you sure you want to log out?')">
+        <img src="https://cdn.discordapp.com/avatars/{{ session['user']['id'] }}/{{ session['user']['avatar'] }}" style="width:28px; height:28px" title="House Cat" alt="House Cat">
+        {{ session['user']['name'] }}
+        </a>
+    {% else %}
+    <!-- Not Logged in -->
+        <a href="/login">Login</a>
+    {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

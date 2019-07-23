@@ -3,5 +3,4 @@
 venv
 *.ttf
 *.db
-*.png
 .idea

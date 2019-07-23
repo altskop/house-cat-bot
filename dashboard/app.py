@@ -65,7 +65,7 @@ API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discordapp.com/api')
 AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
 TOKEN_URL = API_BASE_URL + '/oauth2/token'
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path="", static_folder="templates/static")
 app.debug = True
 app.config['SECRET_KEY'] = OAUTH2_CLIENT_SECRET
 
@@ -92,15 +92,22 @@ def make_session(token=None, state=None, scope=None):
         token_updater=token_updater)
 
 
-@app.route('/')
-def index():
+@app.route('/login')
+def login():
     scope = request.args.get(
         'scope',
-        'identify email connections guilds guilds.join')
+        'identify guilds guilds.join')
     discord = make_session(scope=scope.split(' '))
     authorization_url, state = discord.authorization_url(AUTHORIZATION_BASE_URL)
     session['oauth2_state'] = state
     return redirect(authorization_url)
+
+
+@app.route('/logout')
+def logout():
+    session.pop('oauth2_token')
+    session['logged_in'] = False
+    return redirect(url_for('index'))
 
 
 @app.route('/callback')
@@ -113,6 +120,10 @@ def callback():
         client_secret=OAUTH2_CLIENT_SECRET,
         authorization_response=request.url)
     session['oauth2_token'] = token
+    session['logged_in'] = True
+    discord = make_session(token=session.get('oauth2_token'))
+    user = discord.get(API_BASE_URL + '/users/@me').json()
+    session['user'] = user
     return redirect(url_for('.me'))
 
 
@@ -121,8 +132,12 @@ def me():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
-    connections = discord.get(API_BASE_URL + '/users/@me/connections').json()
-    return jsonify(user=user, guilds=guilds, connections=connections)
+    return jsonify(user=user, guilds=guilds)
+
+
+@app.route('/')
+def index():
+    return render_template('layouts/index.html')
 
 
 @app.route('/create', methods=["GET"])
@@ -137,7 +152,6 @@ def process_create_request():
     json = request.get_json(force=True)
     try:
         validate(instance=json, schema=schema)
-        print("Incoming request")
         base64_data = re.sub('^data:image/.+;base64,', '', json['image']['data'])
         byte_data = base64.b64decode(base64_data)
         image_data = io.BytesIO(byte_data)
@@ -145,7 +159,6 @@ def process_create_request():
         verify_img_size(img)
         validate_metadata(json['metadata'])
         new_template(json['name'], img, json['metadata'])
-        print("Template created")
         return Response("Template created", status=201)
     except FileExistsError as e:
         print(e)
