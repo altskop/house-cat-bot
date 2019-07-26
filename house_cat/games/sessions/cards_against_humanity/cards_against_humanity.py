@@ -126,7 +126,7 @@ class CardsAgainstHumanitySession(Session):
                     else:
                         await self.primary_channel.send("{0} is not in the game.".format(new_host.mention))
 
-        elif message.author == self.czar:
+        if message.author == self.czar:
             if len(self.round_players) == 0:
                 try:
                     winning_card = self.played_cards[int(message.content)]
@@ -136,19 +136,18 @@ class CardsAgainstHumanitySession(Session):
                 except IndexError:
                     await self.primary_channel.send("Invalid input, please try again")
 
-        else:
-            if message.content == "cah join":
-                if message.author not in self.players.keys():
-                    if self.can_be_joined:
-                        if len(self.players.keys()) < MAX_PLAYERS:
-                            self._add_player(message.author)
-                            text = "{0} joins!\n".format(message.author.mention)
-                            text += self._list_players()
-                            await self.primary_channel.send(text)
-                        else:
-                            await self.primary_channel.send("There are already too many players in the game.")
+        if message.content == "cah join":
+            if message.author not in self.players.keys():
+                if self.can_be_joined:
+                    if len(self.players.keys()) < MAX_PLAYERS:
+                        self._add_player(message.author)
+                        text = "{0} joins!\n".format(message.author.mention)
+                        text += self._list_players()
+                        await self.primary_channel.send(text)
                     else:
-                        await self.primary_channel.send("This game is locked.")
+                        await self.primary_channel.send("There are already too many players in the game.")
+                else:
+                    await self.primary_channel.send("This game is locked.")
 
     async def on_expiration(self):
         text = "CAH session has expired due to inactivity :(\n\nFinal Scores:\n"
