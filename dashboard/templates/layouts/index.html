@@ -1,28 +1,37 @@
+<!doctype html>
 <html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
     <title>House Cat - Multifunctional Discord Bot</title>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='style/discord.css') }}" />
 </head>
 <body>
 
-<div class="topnav">
-  <a class="bot-icon" href="#home"><img src="{{ url_for('static', filename='img/icon.png') }}" style="width:28px; height:28px" title="House Cat" alt="House Cat"></a>
-  <a href="#news">News</a>
-  <a href="#contact">Contact</a>
-  <a href="#about">Commands</a>
-    <div class="topnav-right">
-    {% if session['logged_in'] %}
-    <!-- Logged in -->
-        <a href="/logout" onclick="return confirm('Are you sure you want to log out?')">
-        <img src="https://cdn.discordapp.com/avatars/{{ session['user']['id'] }}/{{ session['user']['avatar'] }}" style="width:28px; height:28px" title="House Cat" alt="House Cat">
-        {{ session['user']['name'] }}
-        </a>
-    {% else %}
-    <!-- Not Logged in -->
-        <a href="/login">Login</a>
-    {% endif %}
-    </div>
+{% include 'nav.html' %}
+<br>
+<div class="header">
+    <h1>Spice up your server!</h1>
+    <div class="description">House Cat is an open-source multifunctional Discord bot, featuring meme generation, games, and more!</div>
+    <a href="https://discordapp.com/api/oauth2/authorize?client_id=303023298743238656&permissions=36817984&scope=bot" target="_blank">
+        <button class="discord-button">
+        <img src="{{ url_for('static', filename='img/discord.svg') }}" alt="discord" >
+        Add to Discord
+        </button>
+    </a>
+    <a href="https://github.com/altskop/house-cat-bot" target="_blank">
+        <button class="github-button">
+        <img src="{{ url_for('static', filename='img/github.svg') }}" alt="discord" >
+        Browse on GitHub
+        </button>
+    </a>
+    <br>
+    <br>
+    <br>
+    <br>
+</div>
+
+<div class="body">
+    <h2>Features</h2>
 </div>
 
 </body>

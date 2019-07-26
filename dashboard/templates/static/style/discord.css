@@ -1,45 +1,77 @@
+* {
+    font-family: helvetica;
+    color: rgb(155, 155, 155);
+  }
+
 body {
-    background-color: #363941;
+    /*background-color: #363941;*/
+    background-color: rgb(38, 38, 42);
 }
 
- /* Add a black background color to the top navigation */
-.topnav {
-  overflow: hidden;
-  display: inline-block;
+a {
+    text-decoration:none
 }
 
-/* Style the links inside the navigation bar */
-.topnav a {
-  color: rgb(180, 180, 180);
-  float: left;
-  text-align: center;
-  padding: 14px 16px;
-  text-decoration: none;
-  font-size: 17px;
-  align: center;
-  display: inline-block;
+h1, h2 {
+    color: white;
+    text-align: center;
 }
 
-/* Change the color of links on hover */
-.topnav a:hover {
-  color: white;
+div.header {
+    overflow: hidden;
+    width:50%;
+    margin: 150px 25% 150px 25%;
+    text-align:center;
 }
 
-/* Add a color to the active/current link */
-.topnav a.active {
-  color: white;
+div.body {
+    background-color: rgb(47, 49, 53);
+    border-radius: 5px;
+    overflow: hidden;
+    width:50%;
+    margin: 20px 25% 0 25%;
+    padding: 20px 10px 20px 10px;
 }
 
-.topnav-right {
-  float: right;
-  display: inline-block;
+div.changelog {
+    width:80%;
+    margin: 20px 10% 20px 10%;
+    text-align: left;
 }
 
-.topnav-right a {
-    align: center;
-    display: inline-block;
+.discord-button,
+.github-button {
+    background-color: rgb(118, 137, 212);
+    border-radius: 5px;
+    color: white;
+    padding: 12px 32px 12px 32px;
+    margin-right: 32px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    position:relative;
 }
 
-.bot-icon {
-    display: inline-block;
+.discord-button:hover,
+.github-button:hover {
+    position:relative;
+    top:1px;
+}
+
+.discord-button img,
+.github-button img {
+    margin-right: 12px;
+    width: 24px;
+    vertical-align: middle;
+}
+
+.github-button {
+    background-color: #000000;
+    margin-right: 0;
+}
+
+div.description {
+    color: rgb(155, 155, 155);
+    margin-bottom: 21.44px;
 }

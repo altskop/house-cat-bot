@@ -1,0 +1,189 @@
+.topnav {
+    overflow: hidden;
+    width:70%;
+    margin-top: 15px;
+    margin-left: 15%;
+    margin-right: 15%;
+    text-align:center;
+}
+
+.topnav img {
+    padding: auto;
+    vertical-align: middle;
+}
+
+.topnav-logo {
+    float: left;
+}
+
+.topnav-logo img {
+    margin-bottom: 5px;
+}
+
+.topnav-logo a {
+    padding: 0 25px 10px 0;
+}
+
+.topnav-logo #title {
+    margin: 4px;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.topnav-nav {
+    float: left;
+    margin: 8px;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+    color: rgb(155, 155, 155);
+    padding: 5px 13px 15px 12px;
+    display: inline-block;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.4s;
+}
+
+.topnav a:hover {
+  color: white;
+}
+
+.topnav-right {
+  margin:6px 0 auto auto;
+  overflow: hidden;
+  float: right;
+}
+
+.topnav-right a {
+    margin: 2px;
+}
+
+.discord-avatar {
+    border-radius: 50%;
+    margin: 0px 5px 0px 15px;
+    transition: border-radius 0.4s
+}
+
+.dropdown {
+    float: left;
+    display: inline-block;
+    cursor: pointer;
+}
+
+div.user:hover img {
+    border-radius: 30%;
+}
+
+div.user  span {
+    color: rgb(210, 210, 210);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.4s;
+}
+
+div.user:hover span {
+    color: white;
+}
+
+.dropdown-content {
+  float: none;
+  margin: 7px;
+  display: none;
+  position: absolute;
+  background-color: #FFFFFF;
+  border-radius: 5px;
+  min-width: 40px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+.dropdown-content a {
+  float: none;
+  color: rgb(155, 155, 155);
+  padding: 8px 12px;
+  text-decoration: none;
+  font-size: 12px;
+  display: block;
+  text-align: left;
+}
+
+.dropdown-content:hover a {
+  color: black;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: rgb(242, 242, 242);
+}
+
+.show {display: block;}
+
+.topnav-login {
+  margin: 4px 0 auto auto;
+  overflow: hidden;
+  float: right;
+}
+
+.login-link {
+    padding: 0 0 0 0;
+    margin:0 0 16px auto;
+}
+
+.login-button {
+    float: right;
+    background-color: rgb(118, 137, 212);
+    border-radius: 5px;
+    color: white;
+    padding: 5px 10px 5px 10px;
+    font-size: 13px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    position:relative;
+}
+
+.login-button:hover {
+    position:relative;
+    top:1px;
+}
+
+.login-button img {
+    margin-right: 8px;
+    width: 16px;
+    vertical-align: middle;
+}
+
+.login-button a {
+    padding: 5px 0 15px 0;
+}
+
+a.menuBtn {
+  margin: 7px 0 7px 0;
+  float: left;
+  display: none;
+}
+
+@media screen and (max-width: 983px) {
+  .topnav-logo {display: inline-block; align:center;}
+  .topnav-nav {display: none;}
+  a.menuBtn {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 983px) {
+  .topnav-nav.responsive {
+    display: block;
+    width:100%;
+  }
+  .topnav-right.responsive, .topnav-login.responsive {display: block; float: left; margin: 0 auto;}
+  .topnav-nav.responsive a {
+    width: 100%;
+    float: none;
+    display: block;
+    text-align: left;
+  }
+}
+

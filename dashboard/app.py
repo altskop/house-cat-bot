@@ -7,6 +7,7 @@ import json
 from PIL import Image
 import re
 from jsonschema import validate, exceptions
+from flask_misaka import Misaka
 
 schema = {
     "type": "object",
@@ -68,6 +69,7 @@ TOKEN_URL = API_BASE_URL + '/oauth2/token'
 app = Flask(__name__, static_url_path="", static_folder="templates/static")
 app.debug = True
 app.config['SECRET_KEY'] = OAUTH2_CLIENT_SECRET
+Misaka(app)
 
 if 'http://' in OAUTH2_REDIRECT_URI:
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
@@ -92,6 +94,12 @@ def make_session(token=None, state=None, scope=None):
         token_updater=token_updater)
 
 
+def redirect_url(default='index'):
+    return request.args.get('next') or \
+           request.referrer or \
+           url_for(default)
+
+
 @app.route('/login')
 def login():
     scope = request.args.get(
@@ -100,19 +108,20 @@ def login():
     discord = make_session(scope=scope.split(' '))
     authorization_url, state = discord.authorization_url(AUTHORIZATION_BASE_URL)
     session['oauth2_state'] = state
+    session['referrer'] = request.referrer
     return redirect(authorization_url)
 
 
 @app.route('/logout')
 def logout():
-    session.pop('oauth2_token')
-    session['logged_in'] = False
-    return redirect(url_for('index'))
+    session.clear()
+    return redirect(redirect_url())
 
 
 @app.route('/callback')
 def callback():
     if request.values.get('error'):
+        session.clear()
         return request.values['error']
     discord = make_session(state=session.get('oauth2_state'))
     token = discord.fetch_token(
@@ -124,7 +133,9 @@ def callback():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     session['user'] = user
-    return redirect(url_for('.me'))
+    url = session['referrer']
+    session.pop('referrer')
+    return redirect(url)
 
 
 @app.route('/me')
@@ -138,6 +149,19 @@ def me():
 @app.route('/')
 def index():
     return render_template('layouts/index.html')
+
+
+@app.route('/changelog')
+def changelog():
+    # TODO verify if this is the best way of doing this? Maybe I could just have a regular page instead
+    with open("../CHANGELOG.md", "r") as file:
+        changelog = file.read()
+        return render_template('layouts/changelog.html', changelog=changelog)
+
+
+@app.route('/commands', methods=["GET"])
+def commands():
+    return render_template('layouts/commands.html')
 
 
 @app.route('/create', methods=["GET"])

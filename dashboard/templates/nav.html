@@ -1,0 +1,54 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='style/discord.css') }}" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
+<script type="application/javascript" src="{{ url_for('static', filename='script/nav.js') }}" /></script>
+
+<div class="topnav">
+    <a href="javascript:void(0);" class="menuBtn" onclick="toggleMenu()">
+    <i class="fa fa-bars"></i></a>
+    <div class="topnav-logo">
+        <a href="/">
+        <img src="{{ url_for('static', filename='img/icon.png') }}" style="width:32px; height:32px" title="House Cat" alt="House Cat">
+        <span id="title">House Cat</span></a>
+    </div>
+
+    <nav class="topnav-nav" id="navLinks">
+        <a href="/changelog">Changelog</a>
+        <a href="https://discord.gg/Jnu3eTA" target="_blank">Support Server</a>
+        <a href="/commands">Commands</a>
+    </nav>
+
+
+    {% if session['logged_in'] %}
+    <!-- Logged in -->
+    <div class="topnav-right">
+        <a href="/create" style="float:left;">Dashboard</a>
+
+        <div class="dropdown" onclick="toggleProfileDropdown()">
+            <div class="user">
+                {% if session['user']['avatar'] is not none %}
+                <img class="discord-avatar" src="https://cdn.discordapp.com/avatars/{{ session['user']['id'] }}/{{ session['user']['avatar'] }}" style="width:32px; height:32px" alt="avatar">
+                {% else %}
+                <img class="discord-avatar" src="{{ url_for('static', filename='img/default_avatar.png') }}" style="width:32px; height:32px" alt="avatar">
+                {% endif %}
+                <span> {{ session['user']['username'] }}</span>
+            </div>
+            <div id="profileDropdown" class="dropdown-content">
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+     </div>
+    {% else %}
+    <!-- Not Logged in -->
+    <div class="topnav-login">
+        <a class="login-link" href="/login">
+            <button class="login-button">
+                <img src="{{ url_for('static', filename='img/discord.svg') }}" alt="discord" >
+                Login with Discord
+            </button>
+        </a>
+    </div>
+    {% endif %}
+
+
+</div>
