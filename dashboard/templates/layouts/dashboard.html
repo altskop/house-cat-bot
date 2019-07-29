@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <title>Dashboard | House Cat</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dashboard.css') }}" />
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='script/dashboard.js') }}"></script>
+</head>
+<body>
+
+{% include 'nav.html' %}
+<br>
+<div class="body dashboard">
+
+    <div id="mainMenu">
+        <div class="header">
+            <h1>Meme Templates</h1>
+            <button class="discord-button" onclick="goToCreateNew()">
+                <img src="{{ url_for('static', filename='img/new-document.svg') }}" alt="new" >
+                Create new
+            </button>
+            <button class="github-button" onclick="manageMemes()">
+                <img src="{{ url_for('static', filename='img/settings-gears.svg') }}" alt="manage" >
+                Manage servers
+            </button>
+        </div>
+    </div>
+
+    <div id="loading"><div class="loader"></div></div>
+
+
+    <div id="backBtnDiv">
+        <button class="ui-button" onclick="goToMenu()" style="float: left;">
+                Back
+        </button>
+        <br>
+    </div>
+
+    <div id="insufficientPerms">
+        Sorry, it seems that you share no servers with the bot in which you have sufficient permissions.<br>
+        "Manage Channels" permission is required.
+    </div>
+
+    <div id="createNewMeme">
+        Select servers to upload the new template to:
+        <br><br>
+        <div id="serverList" class="server-list"></div>
+        <br><br>
+        <div id="dropzone" class="dropzone"><span>Drop an image here</span></div>
+        <br>
+        -- or --
+        <br>
+        <br>
+        <button class="ui-button" onclick="">
+            <img src="{{ url_for('static', filename='img/picture.svg') }}" alt="manage" > Choose photo
+        </button>
+        <br>
+        <br>
+        -- or --
+        <br>
+        <br>
+        <input class="text" placeholder="Paste URL" tabindex="12">
+
+    </div>
+
+    <div id="manageMemes">
+
+    </div>
+
+</div>
+
+<div class="footer">
+    <div>Icons made by <a href="https://www.flaticon.com/authors/freepik" title="Freepik">Freepik</a>, <a href="https://www.flaticon.com/authors/smashicons" title="Smashicons">Smashicons</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a></div>
+</div>
+
+</body>
+</html>

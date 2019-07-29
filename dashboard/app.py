@@ -8,6 +8,9 @@ from PIL import Image
 import re
 from jsonschema import validate, exceptions
 from flask_misaka import Misaka
+from src import bot_client
+from functools import wraps
+
 
 schema = {
     "type": "object",
@@ -60,6 +63,7 @@ schema = {
 
 OAUTH2_CLIENT_ID = os.environ['OAUTH2_CLIENT_ID']
 OAUTH2_CLIENT_SECRET = os.environ['OAUTH2_CLIENT_SECRET']
+ACCESS_TOKEN = os.environ['ACCESS_TOKEN']
 OAUTH2_REDIRECT_URI = 'http://localhost:5000/callback'
 
 API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discordapp.com/api')
@@ -70,6 +74,8 @@ app = Flask(__name__, static_url_path="", static_folder="templates/static")
 app.debug = True
 app.config['SECRET_KEY'] = OAUTH2_CLIENT_SECRET
 Misaka(app)
+house_cat_client = bot_client.HouseCatClient(ACCESS_TOKEN)
+
 
 if 'http://' in OAUTH2_REDIRECT_URI:
     os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = 'true'
@@ -77,6 +83,24 @@ if 'http://' in OAUTH2_REDIRECT_URI:
 
 def token_updater(token):
     session['oauth2_token'] = token
+
+
+@app.context_processor
+def utility_processor():
+    def modulo(x, y):
+        return int(x) % int(y)
+    return dict(modulo=modulo)
+
+
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session and 'oauth2_state' in session \
+                and 'oauth2_token' in session and 'user' in session:
+            return f(*args, **kwargs)
+        else:
+            return redirect(url_for('login'))
+    return wrap
 
 
 def make_session(token=None, state=None, scope=None):
@@ -108,7 +132,7 @@ def login():
     discord = make_session(scope=scope.split(' '))
     authorization_url, state = discord.authorization_url(AUTHORIZATION_BASE_URL)
     session['oauth2_state'] = state
-    session['referrer'] = request.referrer
+    session['referrer'] = request.referrer or "/"
     return redirect(authorization_url)
 
 
@@ -139,11 +163,28 @@ def callback():
 
 
 @app.route('/me')
+@login_required
 def me():
     discord = make_session(token=session.get('oauth2_token'))
     user = discord.get(API_BASE_URL + '/users/@me').json()
     guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
     return jsonify(user=user, guilds=guilds)
+
+
+@app.route('/guilds-create', methods=["GET"])
+@login_required
+def guilds_create():
+    discord = make_session(token=session.get('oauth2_token'))
+    guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
+    return jsonify(house_cat_client.get_common_guilds_to_create_template(guilds))
+
+
+@app.route('/guilds-manage', methods=["GET"])
+@login_required
+def guilds_manage():
+    discord = make_session(token=session.get('oauth2_token'))
+    guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
+    return jsonify(house_cat_client.get_common_guilds_to_manage(guilds))
 
 
 @app.route('/')
@@ -162,6 +203,12 @@ def changelog():
 @app.route('/commands', methods=["GET"])
 def commands():
     return render_template('layouts/commands.html')
+
+
+@app.route('/dashboard', methods=["GET"])
+@login_required
+def dashboard():
+    return render_template('layouts/dashboard.html')
 
 
 @app.route('/create', methods=["GET"])

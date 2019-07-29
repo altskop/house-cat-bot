@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style/discord.css') }}" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
-<script type="application/javascript" src="{{ url_for('static', filename='script/nav.js') }}" /></script>
+<script type="application/javascript" src="{{ url_for('static', filename='script/nav.js') }}"></script>
 
 <div class="topnav">
     <a href="javascript:void(0);" class="menuBtn" onclick="toggleMenu()">
@@ -22,14 +22,14 @@
     {% if session['logged_in'] %}
     <!-- Logged in -->
     <div class="topnav-right">
-        <a href="/create" style="float:left;">Dashboard</a>
+        <a href="/dashboard" style="float:left;">Dashboard</a>
 
         <div class="dropdown" onclick="toggleProfileDropdown()">
             <div class="user">
                 {% if session['user']['avatar'] is not none %}
                 <img class="discord-avatar" src="https://cdn.discordapp.com/avatars/{{ session['user']['id'] }}/{{ session['user']['avatar'] }}" style="width:32px; height:32px" alt="avatar">
                 {% else %}
-                <img class="discord-avatar" src="{{ url_for('static', filename='img/default_avatar.png') }}" style="width:32px; height:32px" alt="avatar">
+                <img class="discord-avatar" src="https://cdn.discordapp.com/embed/avatars/{{ modulo(session['user']['discriminator'], 5) }}.png" style="width:32px; height:32px" alt="avatar">
                 {% endif %}
                 <span> {{ session['user']['username'] }}</span>
             </div>

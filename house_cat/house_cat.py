@@ -14,8 +14,8 @@ class HouseCatBot(commands.Bot):
 
     async def on_ready(self):
         print('Logged in as')
-        print(bot.user.name)
-        print(bot.user.id)
+        print(self.user.name)
+        print(self.user.id)
         print('------')
 
 

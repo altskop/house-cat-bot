@@ -6,11 +6,13 @@ function toggleProfileDropdown() {
 
 // Close the dropdown if the user clicks outside of it
 window.onclick = function(e) {
-  if (!document.getElementsByClassName('dropdown')[0].contains(e.target)) {
-  var myDropdown = document.getElementById("profileDropdown");
-    if (myDropdown.classList.contains('show')) {
-      myDropdown.classList.remove('show');
-    }
+  if (document.getElementsByClassName('dropdown')[0]){
+      if (!document.getElementsByClassName('dropdown')[0].contains(e.target)) {
+      var myDropdown = document.getElementById("profileDropdown");
+        if (myDropdown.classList.contains('show')) {
+          myDropdown.classList.remove('show');
+        }
+      }
   }
 }
 

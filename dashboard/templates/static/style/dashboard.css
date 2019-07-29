@@ -1,0 +1,95 @@
+.dashboard {
+    text-align: center;
+    vertical-align: middle;
+}
+#loading {
+    display: none;
+    width: 100%;
+    text-align: center;
+}
+#createNewMeme { display: none; }
+#manageMemes { display: none; }
+#backBtnDiv {
+    display: none;
+    width: 100%;
+    margin: 0 0 50px 20px;
+}
+#insufficientPerms {display: none;}
+
+.dropzone {
+    background-color: rgb(30, 30, 34);
+    box-shadow: inset 0 0 20px 5px rgba(0,0,0,0.4);
+	max-width:700px;
+	max-height:700px;
+	min-width:200px;
+	min-height:200px;
+	margin: auto;
+	transition: box-shadow 0.4s;
+	z-index: 100;
+
+	display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+}
+
+.dropzone.highlight {
+    box-shadow: inset 0 0 20px 10px rgba(99, 150, 208, 0.5);
+}
+
+.dropzone * {
+    pointer-events: none;
+}
+
+.discord-avatar.server-icon {
+  width: 64px;
+  height: 64px;
+  opacity: 0.8;
+  margin: 2px 8px 2px 8px;
+}
+
+.discord-avatar.server-icon.full {
+  opacity: 0.3;
+  border: 2px solid red;
+  margin: 0 6px 0 6px;
+}
+
+.discord-avatar.server-icon.available:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.discord-avatar.server-icon.available.selected {
+  opacity: 1;
+  border: 2px solid white;
+  margin: 0 6px 0 6px;
+}
+
+.loader {
+  margin: auto;
+  border: 6px solid #f3f3f3; /* Light grey */
+  border-top: 6px solid rgb(99, 150, 208); /* Blue */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+input.text {
+  background-color: rgb(30, 30, 34);
+  width: 300px;
+  height: 35px;
+  font-size: 14px;
+  text-align: center;
+  border: unset;
+  outline: 1 px solid rgb(38, 38, 42);
+  transition: outline 1s;
+}
+
+input.text:hover {
+  outline: 1px solid rgb(99, 150, 208);
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

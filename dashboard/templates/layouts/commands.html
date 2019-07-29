@@ -2,16 +2,305 @@
 <html>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <head>
-    <title>House Cat - Multifunctional Discord Bot</title>
+    <title>Commands | House Cat</title>
     <meta charset="utf-8" />
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+
 </head>
 <body>
 
 {% include 'nav.html' %}
 <br>
 <div class="body">
+    <h1>Commands</h1>
+    <br>
 
+    <div>
+      <ul id="table-of-contents">
+      </ul>
+    </div>
+
+    <div id="all-topics">
+        <h2 id="meme-generation">Meme Generation</h2>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                <h3 id="meme-list"><span class="code">$meme list</span></h3>
+                    Run <span class="code">$meme list</span> to get the list of all available templates.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/meme-list.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/drake-meme.png') }}">
+                </div>
+                <div class="feature-description">
+                <h3 id="meme"><span class="code">$meme</span></h3>
+                    To create a meme, run <span class="code">$meme TEMPLATE_NAME "text field" "text field" ...</span>, where TEMPLATE_NAME is, obviously, the template name (which you can get from the <span class="code">$meme list</span>), and "text fields" contain your text for each entry field. Very simple, very straightforward. Make sure to encase your text in quotation marks.
+                </div>
+
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    You can also leave a field empty by opening a quotation mark and then immediately closing it like this <span class="code">""</span>.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/meme-drake-empty.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/meme-display.png') }}">
+                </div>
+                <div class="feature-description">
+                    If you want to know what certain template looks like, run <span class="code">$meme TEMPLATE_NAME</span>. You will get an image of the template, where text fields will appear as green rectangles, marked with their position's number. So the rectangle #1 will indicate the first text field, rectangle #2 second, and so on.
+                </div>
+            </div>
+
+
+        <h2 id="mocking">Mocking</h2>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                <h3 id="mock"><span class="code">$mock</span></h3>
+                    To generate a Mocking Spongebob meme with "jUmPy" text, run <span class="code">$mock</span>. If no text was provided, it will "mock" the previous message.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/mock.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/mock-arg.png') }}">
+                </div>
+                <div class="feature-description">
+                    Alternatively, you can provide text for it to mock if you have something specific in mind.
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                <h3 id="mock-text"><span class="code">$mock-text</span></h3>
+                    If you find yourself in need of some "jUmPinEss" in your life, use <span class="code">$mock-text</span> to convert your text to jUmPy text. If no text was provided, it will jUmPiAnYzE the previous message.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/mock-text.png') }}">
+                </div>
+            </div>
+
+
+        <h2 id="dice-rolling">Dice Rolling</h2>
+            <div class="feature-entry">
+                <div class="feature-description">
+                <h3 id="roll"><span class="code">$roll</span></h3>
+                    You can roll dice using <span class="code">$roll</span> command. By default, it will roll a single d20 die.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/roll.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/roll-sides.png') }}">
+                </div>
+                <div class="feature-description">
+                    You can specify the amount of sides for a roll. You can use either <span class="code">$roll 10</span> or <span class="code">$roll d10</span> to roll a 10-sided die, both commands work.
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    You can also roll multiple dice at once!
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/roll-many.png') }}">
+                </div>
+            </div>
+
+        <h2 id="polling">Polls</h2>
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/poll.png') }}">
+                </div>
+                <div class="feature-description">
+                <h3 id="poll"><span class="code">$poll</span></h3>
+                    Start a poll by using <span class="code">poll "QUESTION" "CHOICE 1" "CHOICE 2" ...</span> command.
+                </div>
+            </div>
+
+        <h2 id="thesaurization">Thesaurizing</h2>
+            <div class="feature-entry">
+                <div class="feature-description">
+                <h3 id="thesaurize"><span class="code">$thesaurize</span></h3>
+                    Use this command to replace words in the previous message with random synonyms! Sometimes it's funny, most of the time it's just gibberish though.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/thesaurize.png') }}">
+                </div>
+            </div>
+
+        <h2 id="magic8ball-main">Magic 8-Ball</h2>
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/magic8ball.png') }}">
+                </div>
+                <div class="feature-description">
+                <h3 id="magic8ball"><span class="code">$magic8ball</span></h3>
+                    Feeling lost and in need of advice? Ask the Magic 8-Ball!<br>
+                    <span style="font-size: 8px">All responses are meant to be humorous and the command is meant for entertainment only. Please don't use the Magic 8-Ball to make any important life choices. Or do, I mean whatever. Hey $magic8ball, should people use you for making their life choices?</span>
+                </div>
+            </div>
+
+        <h2 id="games">$game Games</h2>
+            <div class="feature-entry">
+                <div class="feature-description">
+                <h3 id="rps">Rock-Paper-Scissors</h3>
+                    Use <span class="code">$game rock-paper-scissors @Opponent_Mention</span> (or <span class="code">$game rps @Opponent_Mention</span> for short) to challenge somebody to a game of Rock-Paper-Scissors. You may select as many participants as you like.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/rps-game-0.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/rps-game-choice-1.png') }}">
+                </div>
+                <div class="feature-description">
+                    All participants will then receive a Direct Message with instructions on how to proceed. Respond with either a number of your choice or type it in (you could say "1" or "Rock" to play rock).
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    Game results will be posted as soon as all participants have made their move.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/rps-game.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/game-cah.png') }}">
+                </div>
+                <div class="feature-description">
+                <h3 id="cah">Cards Against Humanity</h3>
+                    You can host a game of Cards Against Humanity by using <span class="code">$game cards-against-humanity</span> or <span class="code">$game cah</span> for short. A message will appear with instructions on how to play.
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    Players can join the game by typing <span class="code">cah join</span>.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-join.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-limit.png') }}">
+                </div>
+                <div class="feature-description">
+                    You can set the point limit at any time by typing <span class="code">cah limit NUMBER</span>.
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    Transfer the host privileges to another player by typing <span class="code">cah host @Mention</span>.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-host.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-kick.png') }}">
+                </div>
+                <div class="feature-description">
+                    If <i>that one guy</i> joined and you didn't want him to, you may kick him by using <span class="code">cah kick @Mention</span>.
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    If he keeps coming back, you can lock the game with <span class="code">cah lock</span>. so that nobody else can join.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-lock.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-unlock.png') }}">
+                </div>
+                <div class="feature-description">
+                    Use <span class="code">cah unlock</span> to make it open again.
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    Once you have enough players, start the game with <span class="code">cah start</span>.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-start.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-list.png') }}">
+                </div>
+                <div class="feature-description">
+                    Participating players will receive DMs with the list of their cards. Use a card's number to play it.
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    You can also play blank cards. To do so, choose a blank card first, then type in your text.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-blank.png') }}">
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-gamble.png') }}">
+                </div>
+                <div class="feature-description">
+                    If you feel like you have more than one card that you could use in this round, you could <span class="code">gamble</span> to bet 1 Awesome Point for the opportunity to submit two cards (or two pairs). If you win, your bet will be returned to you, but if you lose, the winner will get it.
+                </div>
+            </div>
+
+            <div class="feature-entry">
+                <div class="feature-description">
+                    If at any time you feel like the end is nigh and your cards just can't cut it, end the game by typing <span class="code">cah end</span>.
+                </div>
+                <div class="feature-description">
+                    <img class="screenshot" src="{{ url_for('static', filename='img/screenshots/cah-end.png') }}">
+                </div>
+            </div>
+
+    <br>
+    </div>
 </div>
+
+<script type="application/javascript" src="{{ url_for('static', filename='script/table_of_contents.js') }}"></script>
 
 </body>
 </html>
