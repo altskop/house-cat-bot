@@ -55,6 +55,5 @@ class HouseCatClient:
     def _get_guilds(self):
         headers = {"Authorization": "Bot " + self.token}
         response = requests.get('https://discordapp.com/api/users/@me/guilds', headers=headers)
-        print(response.headers)
         self.next_reset = int(response.headers.get("X-RateLimit-Reset"))
         return response

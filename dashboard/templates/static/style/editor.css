@@ -1,0 +1,258 @@
+.editor {
+    display: flex;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+}
+
+.template-display-container {
+    text-align: center;
+}
+
+.template-display {
+    display: flex;
+    position: relative;
+    border: 6px solid rgb(30, 30, 34);
+    margin-right: 12px;
+}
+
+.template-settings {
+    display: inline-block;
+    text-align: left;
+}
+
+/*
+    -----------------------------------------------
+    Custom Discord-styled checkbox follows next.
+    -----------------------------------------------
+*/
+
+/* Customize the label (the container) */
+.discord-checkbox {
+  display: block;
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Hide the browser's default checkbox */
+.discord-checkbox input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 16px;
+  width: 16px;
+  background-color: rgb(55, 57, 62);
+}
+
+/* On mouse-over, add a grey background color */
+.discord-checkbox:hover input ~ .checkmark {
+  background-color: rgb(62, 64, 68);
+}
+
+/* When the checkbox is checked, add a blue background */
+.discord-checkbox input:checked ~ .checkmark {
+  background-color: rgb(118, 137, 212);
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+/* Show the checkmark when checked */
+.discord-checkbox input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Style the checkmark/indicator */
+.discord-checkbox .checkmark:after {
+  left: 5px;
+  width: 4px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+}
+
+
+
+/*
+    -----------------------------------------------
+    Custom Discord-styled select style follow next.
+    -----------------------------------------------
+*/
+
+.discord-select {
+    display: inline-block;
+    line-height: 1.3;
+    padding: .6em 1.4em .5em .8em;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-left: 1px;
+    margin-right: 4px;
+    border: 1px solid #888;
+    box-shadow: 0 1px 0 1px rgba(0,0,0,.04);
+    border-radius: .5em;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: rgb(55, 57, 62);
+    background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007CB2%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'),
+      linear-gradient(to bottom, rgb(55, 57, 62) 0%, rgb(62, 64, 68) 100%);
+    background-repeat: no-repeat, repeat;
+    background-position: right .7em top 50%, 0 0;
+    background-size: .65em auto, 100%;
+}
+.discord-select::-ms-expand {
+    display: none;
+}
+.discord-select:hover {
+    border-color: #aaa;
+}
+
+.discord-select:focus {
+    border-color: #aaa;
+    box-shadow: 0 0 1px 3px rgba(59, 153, 252, .7);
+    box-shadow: 0 0 0 3px -moz-mac-focusring;
+    outline: none;
+}
+.discord-select option {
+    font-weight:normal;
+}
+
+/*
+
+*/
+
+
+canvas {
+   position: absolute;
+
+}
+
+#fieldsCanvas {
+    z-index: 10;
+}
+
+.fields-list {
+    background-color: rgb(30, 30, 34);
+    max-height:210px;
+    overflow:hidden;
+    overflow-y:scroll;
+    list-style-type: none;
+    padding-inline-start: 6px;
+
+}
+
+.fields-list li {
+    display: flex;
+    justify-content: space-between; /* align horizontal */
+    align-items: center; /* align vertical */
+    margin: 10px 6px 10px 0;
+    padding: 4px;
+    background-color: rgb(55, 57, 62);
+    border-radius: 5px;
+    cursor: move;
+}
+
+.fields-list span {
+    font-size: 12px;
+}
+
+
+.fields-list input {
+    margin: 2px 4px 2px 4px;
+}
+
+.fields-list b {
+    font-size: 16px;
+    margin-right: 5px;
+}
+
+.fields-list .delete-button {
+    color: red;
+    cursor: pointer;
+    font-size: 18px;
+    padding: 1px;
+    margin: 0 4px 0 4px;
+}
+
+.fields-list .copy-button {
+    color: white;
+    cursor: pointer;
+    font-size: 24px;
+    padding: 1px;
+    margin: 0 4px 0 4px;
+}
+
+i {
+    font-size: 12px;
+}
+
+input.template-name-input {
+    width: 100%;
+    display: inline-block;
+    margin-left: 4px;
+    overflow: hidden;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+div.input-field-section {
+    display: flex;
+    width: 100%;
+    justify-content: center; /* align horizontal */
+    align-items: center; /* align vertical */
+}
+
+
+.notification {
+    display: none;
+    font-size: 12px;
+    padding: 6px;
+    margin-bottom: 4px;
+    width: auto;
+    overflow: hidden;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.notification.success {
+    display: block;
+    color: limegreen;
+    border: 1px solid limegreen;
+    background-color: rgba(0, 255, 0, 0.15);
+}
+
+.notification.fail {
+    display: block;
+    color: red;
+    border: 1px solid red;
+    background-color: rgba(255, 0, 0, 0.15);
+}
+
+input.color {
+  background-color: rgb(30, 30, 34);;
+  width: 40px;
+  height: 20px;
+  border-radius: 5px;
+  padding: 1px;
+}

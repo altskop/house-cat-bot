@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<head>
+    <title>Dashboard | House Cat</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/dashboard.css') }}" />
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script type="application/javascript" src="{{ url_for('static', filename='script/editor.js') }}"></script>
+<!--    <script type="application/javascript" src="{{ url_for('static', filename='script/dashboard.js') }}"></script>-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style/editor.css') }}" />
+</head>
+<body>
+
+{% include 'nav.html' %}
+
+<div id="editor" style="display: block;">
+    <div class="editor">
+        <div class="template-display-container">
+            <br>
+            <br>
+            <div class="template-display" id="templateDisplay">
+                <canvas id="templateImg"></canvas>
+                <canvas id="fieldsCanvas"></canvas>
+            </div>
+            <br>
+            <div>
+                <input type="color" class="color" id="editorFieldsColorInput" value="#00FF00"> Color of fields in the editor
+            </div>
+        </div>
+        <div id="templateSettings" class="template-settings">
+            <div id="mainNotification" class="notification"></div>
+            <br>
+            <i>Click and drag on the image to create a text field.
+                <br>
+                You can move the fields by dragging, drag their edges to resize them,
+                <br>
+                and change their order in the list.
+            </i><br><br>
+            <label class="discord-checkbox">
+              <input type="checkbox" name="same-font" id="sameFontCheckbox" checked="checked" onclick="toggleFontSelection(this);"> Same font for all fields
+              <span class="checkmark"></span>
+            </label>
+            <div id="fontSelectionMenu">
+                Font:
+                <select id="fontSelect" name="fonts" class="discord-select" onchange="changeAllFont();">
+                  <option value="normal">Regular</option>
+                  <option value="bold">Bold (with thick stroke)</option>
+                </select>
+            </div>
+            <ul id="fieldsList" class="fields-list"></ul>
+            <div id="inputNotification" class="notification"></div>
+            <div class="input-field-section">
+                <span>Template name:</span>
+                <input id="templateName" title="Help" class="text template-name-input" maxlength="21" tabindex="12">
+            </div>
+            <br>
+            <div class="input-field-section">
+                <button class="discord-button submit-button" onclick="uploadTemplate()">
+                    <img src="{{ url_for('static', filename='img/cloud-upload.svg') }}" alt="new" >
+                    Upload!
+                </button>
+                <button class="discord-button ui-button" onclick="fetchPreview()">
+                    <img src="{{ url_for('static', filename='img/preview.svg') }}" alt="new" >
+                    Preview
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>

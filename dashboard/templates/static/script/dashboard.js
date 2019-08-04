@@ -3,31 +3,31 @@ $(document).ready(function() {
 	dropZone.addEventListener("dragenter", handleDragEnter, false);
     dropZone.addEventListener("dragleave", handleDragLeave, false);
 	dropZone.addEventListener('drop', handleFileSelect, false);
+
+    var inputField = document.getElementById('getFileField');
+    inputField.addEventListener('paste', handlePasteEvent, false);
+    inputField.addEventListener('input', handleUrlFieldUpdate, false);
 });
+
+function getFileInput() {
+    document.getElementById('getFileInput').click();
+}
 
 $(document).bind('drop dragover', function (e) {
     e.preventDefault();
 });
-
-function goToMenu() {
-  $('#mainMenu').show();
-  $("#createNewMeme").hide();
-  $('#backBtnDiv').hide();
-  $("#insufficientPerms").hide();
-
-  document.getElementById('serverList').innerHTML = '';
-};
 
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function goToCreateNew() {
   $('#mainMenu').hide();
   $("#loading").show();
+  $('#editor').hide();
   $.getJSON("/guilds-create", function(data) {
     $("#loading").hide();
     if (data.length>0) {
         var serverList = document.getElementById('serverList');
-        populateServerList(serverList, data);
+        populateServerList(serverList, data, true);
         $("#createNewMeme").show();
         $('#backBtnDiv').show();
     } else {
@@ -37,9 +37,11 @@ function goToCreateNew() {
   });
 };
 
-function populateServerList(serverListElement, data) {
+function populateServerList(serverListElement, data, lockFullServers) {
     for (var i in data) {
         var guild = data[i];
+        var div = document.createElement("div");
+        div.classList.add("container");
         var img = document.createElement("img");
         if (guild['icon'] != null) {
             img.src ="https://cdn.discordapp.com/icons/" + guild['id'] + "/" + guild['icon'];
@@ -65,7 +67,16 @@ function populateServerList(serverListElement, data) {
         img.classList.add('server-icon');
         img.classList.add('available'); // TODO No restrictions for dev purpopses
         img.onclick = selectServer;
-        serverListElement.appendChild(img);
+        div.appendChild(img);
+        // TODO append FULL on top of image and add a "full" class if server is full
+//        if (lockFullServers){
+//        if (guild['icon'] == null) {
+//            var txt = document.createElement("p");
+//            txt.innerHTML = "FULL";
+//            div.appendChild(txt);
+//        }
+//        }
+        serverListElement.appendChild(div);
 
     }
 }
@@ -81,6 +92,19 @@ function selectServer(event) {
     }
 }
 
+function getSelectedServers(){
+    var list = [];
+    var serverList = document.getElementById('serverList');
+    $('img', $('#serverList')).each(function () {
+        if (this.classList.contains("selected")) {
+            list.push(this.id); //log every element found to console output
+        }
+    });
+    return list;
+}
+
+
+
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
 function handleDragEnter() {
@@ -95,3 +119,61 @@ function handleDragLeave() {
     var dropZone = document.getElementById("dropzone");
     dropZone.classList.remove("highlight");
 };
+
+function handleFileSelect(evt) {
+    var dataTransfer = evt.dataTransfer; // FileList object.
+    readImage(dataTransfer);
+}
+
+function handlePasteEvent(evt) {
+    readImage(evt.clipboardData);
+}
+
+function handleUrlFieldUpdate(e) {
+    var element = e.target;
+    element.classList.remove("notfound");
+    var url = element.value;
+    if (url.startsWith("http://") || url.startsWith("https://")){
+        isUrlAnImage(url, 2000).then(
+          function(result) { loadEditor(url); },
+          function(error) { element.classList.add('notfound'); }
+        );
+    }
+}
+
+function readImage(input) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+
+        reader.onload = function (e) {
+            loadEditor(e.target.result);
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function isUrlAnImage(url, timeoutT) {
+    return new Promise(function (resolve, reject) {
+        var timeout = timeoutT || 5000;
+        var timer, img = new Image();
+        img.onerror = img.onabort = function () {
+            console.log('error');
+            clearTimeout(timer);
+            reject("error");
+        };
+        img.onload = function () {
+            console.log('success');
+            clearTimeout(timer);
+            resolve("success");
+        };
+        timer = setTimeout(function () {
+            // reset .src to invalid URL so it stops previous
+            // loading, but doesn't trigger new load
+            img.src = "//!!!!/test.jpg";
+            console.log('error');
+            reject("timeout");
+        }, timeout);
+        img.src = url;
+    });
+}

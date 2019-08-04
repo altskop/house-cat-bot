@@ -15,6 +15,7 @@
     margin: 0 0 50px 20px;
 }
 #insufficientPerms {display: none;}
+#editor {display: none;}
 
 .dropzone {
     background-color: rgb(30, 30, 34);
@@ -85,8 +86,34 @@ input.text {
   transition: outline 1s;
 }
 
+.container {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+}
+
+.container p {
+  opacity: 0.3;
+  margin: auto;
+  font-size: 18px;
+  font-weight: bold;
+  color: red;
+  position: absolute;
+  top: 47%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
 input.text:hover {
   outline: 1px solid rgb(99, 150, 208);
+}
+
+input.text.notfound {
+  outline: 2px solid red;
+}
+
+input.text.success {
+  outline: 2px solid green;
 }
 
 @keyframes spin {
