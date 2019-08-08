@@ -126,9 +126,21 @@ def callback():
     return redirect(url)
 
 
-def get_common_guilds_with_create_perms():
+def get_user_guilds():
     discord = make_session(token=session.get('oauth2_token'))
     guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
+    if type(guilds) == list:
+        session['guilds'] = guilds
+        return guilds
+    elif "guilds" in session:
+        print("Error: response from API is null, falling back to session cache.")
+        return session['guilds']
+    else:
+        abort(500)
+
+
+def get_common_guilds_with_create_perms():
+    guilds = get_user_guilds()
     result = house_cat_client.get_common_guilds_to_create_template(guilds)
     if session['user']['id'] == OWNER_ID:
         result.append({"name": "global", "id": "global"})
@@ -152,12 +164,13 @@ def check_template_name():
 @app.route('/guilds-create', methods=["GET"])
 @login_required
 def guilds_create():
-    return jsonify(get_common_guilds_with_create_perms())
+    guilds = get_common_guilds_with_create_perms()
+    guilds_templates = postgres_connector.PostgresConnector().get_guilds_templates(guilds)
+    return jsonify(guilds_templates)
 
 
 def get_common_guilds_with_manage_perms():
-    discord = make_session(token=session.get('oauth2_token'))
-    guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
+    guilds = get_user_guilds()
     result = house_cat_client.get_common_guilds_to_manage(guilds)
     if session['user']['id'] == OWNER_ID:
         result.append({"name": "global", "id": "global"})
@@ -167,9 +180,7 @@ def get_common_guilds_with_manage_perms():
 @app.route('/guilds-manage', methods=["GET"])
 @login_required
 def guilds_manage():
-    discord = make_session(token=session.get('oauth2_token'))
-    guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
-    return jsonify(house_cat_client.get_common_guilds_to_manage(guilds))
+    return jsonify(get_common_guilds_with_manage_perms())
 
 
 @app.route('/')

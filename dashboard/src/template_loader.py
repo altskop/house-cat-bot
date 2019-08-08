@@ -110,6 +110,11 @@ class TemplateLoader:
         self.guilds = [x for x in json['guilds'] if x in self.guilds]
         if len(self.guilds) == 0:
             raise ValueError("No selected guilds with sufficient perms")
+        guilds_dicts = [{"id": x} for x in self.guilds]
+        guilds_availability = self.connector.get_guilds_templates(guilds_dicts)
+        self.guilds = [x['id'] for x in guilds_availability if x['full'] is False]
+        if len(self.guilds) == 0:
+            raise ValueError("Selected server is full.")
 
     def _b64_to_img_blob(self, image_data):
         base64_data = re.sub('^data:image/.+;base64,', '', image_data)

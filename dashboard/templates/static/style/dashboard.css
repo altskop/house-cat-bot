@@ -104,7 +104,7 @@ input.text {
 }
 
 .container p {
-  opacity: 0.3;
+  opacity: 0.6;
   margin: auto;
   font-size: 18px;
   font-weight: bold;
@@ -113,6 +113,7 @@ input.text {
   top: 47%;
   left: 50%;
   transform: translate(-50%, -50%);
+  user-select: none;
 }
 
 input.text:hover {

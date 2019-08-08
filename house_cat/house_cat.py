@@ -13,21 +13,17 @@ class HouseCatBot(commands.Bot):
         super().__init__(*args, **kwargs)
         self.color = 0x5297d5
 
-        self._database = DiscordDb(host=os.environ['PG_HOST'],
-                                   port=os.environ['PG_PORT'],
-                                   dbname='house_cat_db',
-                                   user=os.environ['PG_USER'],
-                                   password=os.environ['PG_PASSWORD'])
+        self.database = DiscordDb(host=os.environ['PG_HOST'],
+                                  port=os.environ['PG_PORT'],
+                                  dbname='house_cat_db',
+                                  user=os.environ['PG_USER'],
+                                  password=os.environ['PG_PASSWORD'])
 
     async def on_ready(self):
         print('Logged in as')
         print(self.user.name)
         print(self.user.id)
         print('------')
-
-    @property
-    def database(self):
-        return self._database
 
     @property
     def guilds(self):

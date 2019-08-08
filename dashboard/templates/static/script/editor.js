@@ -770,9 +770,7 @@ function uploadTemplate(btn){
                setMainNotification("Template created!", true);
                changeUploadBtnToDefault(btn);
                // Disable navigation prompt
-                window.onbeforeunload = function() {
-                    return false;
-                };
+               window.onbeforeunload = null;
              }
            ).fail(function(data) {
                 document.body.style.cursor = "auto";

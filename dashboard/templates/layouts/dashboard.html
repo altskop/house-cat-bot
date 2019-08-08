@@ -25,7 +25,7 @@
                 <img src="{{ url_for('static', filename='img/new-document.svg') }}" alt="new" >
                 Create new
             </button>
-            <button class="github-button" onclick="manageMemes()">
+            <button class="github-button" onclick="goToManage()">
                 <img src="{{ url_for('static', filename='img/settings-gears.svg') }}" alt="manage" >
                 Manage servers
             </button>
@@ -75,7 +75,10 @@
     </div>
 
     <div id="manageMemes">
-
+        Select a server to manage templates:
+        <br><br>
+        <div id="manageServerList" class="server-list"></div>
+        <br><br>
     </div>
 
 </div>

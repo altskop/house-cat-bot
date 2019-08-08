@@ -27,7 +27,7 @@ function goToCreateNew() {
     $("#loading").hide();
     if (data.length>0) {
         var serverList = document.getElementById('serverList');
-        populateServerList(serverList, data, true);
+        populateServerList(serverList, data, false);
         $("#createNewMeme").show();
         $('#backBtnDiv').show();
     } else {
@@ -37,7 +37,7 @@ function goToCreateNew() {
   });
 };
 
-function populateServerList(serverListElement, data, lockFullServers) {
+function populateServerList(serverListElement, data, isManage) {
     for (var i in data) {
         var guild = data[i];
         var div = document.createElement("div");
@@ -65,17 +65,25 @@ function populateServerList(serverListElement, data, lockFullServers) {
         img.title = guild['name'];
         img.classList.add('discord-avatar');
         img.classList.add('server-icon');
-        img.classList.add('available'); // TODO No restrictions for dev purpopses
-        img.onclick = selectServer;
+         // TODO No restrictions for dev purpopses
+        if (isManage){
+            img.onclick = chooseServer;
+        } else {
+            img.onclick = selectServer;
+        }
+
         div.appendChild(img);
         // TODO append FULL on top of image and add a "full" class if server is full
-//        if (lockFullServers){
-//        if (guild['icon'] == null) {
-//            var txt = document.createElement("p");
-//            txt.innerHTML = "FULL";
-//            div.appendChild(txt);
-//        }
-//        }
+        if (!isManage){
+            if (guild['full'] == true) {
+                var txt = document.createElement("p");
+                txt.innerHTML = "FULL";
+                div.appendChild(txt);
+                img.classList.add('full');
+            } else {
+                img.classList.add('available');
+            }
+        }
         serverListElement.appendChild(div);
 
     }
@@ -90,6 +98,13 @@ function selectServer(event) {
             element.classList.add("selected");
         }
     }
+}
+
+function chooseServer(event) {
+    $('img', $('#manageServerList')).each(function () {
+        this.classList.remove("selected");
+    });
+    selectServer(event);
 }
 
 function getSelectedServers(){
@@ -177,3 +192,27 @@ function isUrlAnImage(url, timeoutT) {
         img.src = url;
     });
 }
+
+
+
+// MANAGE TEMPLATES
+
+
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+function goToManage() {
+  $('#mainMenu').hide();
+  $("#loading").show();
+  $.getJSON("/guilds-manage", function(data) {
+    $("#loading").hide();
+    if (data.length>0) {
+        var serverList = document.getElementById('manageServerList');
+        populateServerList(serverList, data, true);
+        $("#manageMemes").show();
+        $('#backBtnDiv').show();
+    } else {
+        $("#insufficientPerms").show();
+        $('#backBtnDiv').show();
+    }
+  });
+};
