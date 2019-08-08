@@ -29,6 +29,15 @@ class HouseCatBot(commands.Bot):
     def database(self):
         return self._database
 
+    @property
+    def guilds(self):
+        """
+        Cache guilds every time we query them in the database.
+        """
+        guilds = super().guilds
+        self.database.set_guilds(guilds)
+        return guilds
+
 
 logger = logging.getLogger('house-cat')
 logger.setLevel(logging.DEBUG)

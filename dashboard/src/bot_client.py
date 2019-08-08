@@ -1,5 +1,6 @@
 import requests
 from time import sleep, time
+from .postgres_connector import PostgresConnector
 
 
 class HouseCatClient:
@@ -10,8 +11,6 @@ class HouseCatClient:
     """
     def __init__(self, token):
         self.token = token
-        self.cached_guilds = []
-        self.next_reset = 0
 
     @staticmethod
     def _can_manage_messages(permissions):
@@ -40,17 +39,14 @@ class HouseCatClient:
         return list(set(self.guilds()).intersection(user_guilds))
 
     def guilds(self):
-        if time() < self.next_reset:
-            return self.cached_guilds
         response = self._get_guilds()
         if response.status_code == 200:
             guilds = [x['id'] for x in response.json()]
-            self.cached_guilds = guilds
+            PostgresConnector().set_guilds(guilds)
             return guilds
-        while response.status_code == 429:
-            millis_to_sleep = response.headers.get("Retry-After")
-            sleep(int(millis_to_sleep)/1000)
-            return self.guilds()
+        if response.status_code == 429:
+            guilds = PostgresConnector().get_guilds()
+            return [x['id'] for x in guilds]
 
     def _get_guilds(self):
         headers = {"Authorization": "Bot " + self.token}

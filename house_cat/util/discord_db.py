@@ -1,5 +1,6 @@
 from . import database_handler
 import psycopg2
+import psycopg2.extras
 
 
 class DiscordDb(database_handler.DBHandler):
@@ -29,6 +30,24 @@ class DiscordDb(database_handler.DBHandler):
             c.execute(sql_string, (name, guilds))
             return c.fetchone()
 
+    def get_guilds(self):
+        conn = self.conn
+        with conn:
+            c = self.cursor
+            c.execute("select id from guilds;")
+            return c.fetchall()
+
+    def set_guilds(self, guilds: list):
+        guilds_values = [(x.id,) for x in guilds]
+        conn = self.conn
+        with conn:
+            c = self.cursor
+            c.execute("truncate guilds;")
+            insert_query = 'insert into guilds (id) values %s'
+            psycopg2.extras.execute_values(
+                c, insert_query, guilds_values
+            )
+
     def initialize_db(self):
         # Connect to database. If the file doesn't exist, create it
         conn = self.conn
@@ -38,8 +57,13 @@ class DiscordDb(database_handler.DBHandler):
                 c.execute("select id, metadata, image, author from memes;")
                 c.execute("select name, guild, meme from guildMemes;")
                 c.execute("select command, arg1, arg2, args, author, guild, datetime, success from queries;")
+                c.execute("select id from guilds;")
             except psycopg2.ProgrammingError:
-                # If the tables don't exist, create them
+                # Purge tables
+                c.execute("DROP TABLE IF EXISTS memes, guildMemes;")
+                c.execute("DROP TABLE IF EXISTS queries;")
+                c.execute("DROP TABLE IF EXISTS guilds;")
+                # Create tables
                 c.execute("create table memes("
                           "id SERIAL primary key not null,"
                           "metadata json not null,"

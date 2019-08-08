@@ -8,6 +8,7 @@ from jsonschema import exceptions
 from flask_misaka import Misaka
 from src import bot_client
 from src import template_loader
+from src import postgres_connector
 from functools import wraps
 
 
@@ -141,7 +142,7 @@ def check_template_name():
         data = json.loads(urllib.parse.unquote(request.query_string.decode("utf-8")))
         name = data.get('name')
         guilds = data.get('guilds')  # TODO security concern
-        connector = template_loader.PostgresConnector()
+        connector = postgres_connector.PostgresConnector()
         connector.verify_name_uniqueness(name, guilds)
         return Response("Name available", status=200)
     except ValueError:
