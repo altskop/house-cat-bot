@@ -1,10 +1,6 @@
 var editor;
 var delayTimer;
 
-//$(document).ready(function() { // TODO debug function remove later
-//    loadEditor("https://upload.wikimedia.org/wikipedia/en/8/8b/Purplecom.jpg");
-//});
-
 $( function() {
     $( "#fieldsList" ).sortable({
         start: function(event, ui) {
@@ -36,12 +32,49 @@ function loadEditor(url) {
     img.src = url;
 
     $('#imageLoadingInputs').hide();
+    $('#previewCanvas').hide();
+    $('#previewSettings').hide();
     $('#editor').show();
 
-    // Enable navigation prompt TODO reenable
-//    window.onbeforeunload = function() {
-//        return true;
-//    };
+    // Enable navigation prompt
+    window.onbeforeunload = function() {
+        return true;
+    };
+}
+
+function loadImage (img)
+{
+    console.log(img.width, img.height);
+    size = setWidth(img.width, img.height, 600);
+    console.log(size);
+	editor.canvas.width = size.width;
+	editor.canvas.height = size.height;
+
+	editor.context.drawImage(img,0,0,size.width,size.height);
+
+	editor.drawCanvas.width = size.width;
+	editor.drawCanvas.height = size.height;
+	editor.drawCanvas.top = -size.height;
+
+	templateDisplay = document.getElementById('templateDisplay');
+	templateDisplay.style.width = size.width+"px";
+	templateDisplay.style.height = size.height+"px";
+	templateDisplay.style.minWidth = size.width+"px";
+	templateDisplay.style.minHeight = size.height+"px";
+
+	editor.drawCanvas.addEventListener('mousedown', mouseDown, false);
+    editor.drawCanvas.addEventListener('mouseup', mouseUp, false);
+    editor.drawCanvas.addEventListener('mousemove', mouseMove, false);
+    editor.drawCanvas.addEventListener('mouseout', mouseOut, false);
+    document.addEventListener("mouseup", mouseUpOutsideOfCanvas, false);
+
+    var editorFieldsColorInput = document.getElementById('editorFieldsColorInput');
+    editor.setEditorFieldsColor(editorFieldsColorInput.value);
+    editorFieldsColorInput.onchange = function() { editor.setEditorFieldsColor(this.value); };
+
+    var templateNameField = document.getElementById('templateName');
+    templateNameField.addEventListener('paste', verifyTemplateName, false);
+    templateNameField.addEventListener('input', verifyTemplateName, false);
 }
 
 class Color {
@@ -166,7 +199,7 @@ class Editor {
 
     addNewField(w, h){
 
-        if (Math.abs(w) < 15 && Math.abs(h) < 9) {
+        if (Math.abs(w) < 16 || Math.abs(h) < 9) {
             return;
         }
 
@@ -711,7 +744,6 @@ function changeUploadBtnToDefault(btn){
     $('div', btn).each(function () {
         this.remove();
     });
-//    btn.innerHTML.replace("<div class=\"button-loader\"></div>", "");
 }
 
 function uploadTemplate(btn){
@@ -736,7 +768,11 @@ function uploadTemplate(btn){
              function(data) {
                document.body.style.cursor = "auto";
                setMainNotification("Template created!", true);
-               changeUploadBtnToDefault(btn)
+               changeUploadBtnToDefault(btn);
+               // Disable navigation prompt
+                window.onbeforeunload = function() {
+                    return false;
+                };
              }
            ).fail(function(data) {
                 document.body.style.cursor = "auto";
@@ -746,46 +782,105 @@ function uploadTemplate(btn){
     }
 }
 
-
-function loadImage (img)
-{
-    console.log(img.width, img.height);
-    size = setWidth(img.width, img.height, 600);
-    console.log(size);
-	editor.canvas.width = size.width;
-	editor.canvas.height = size.height;
-
-	editor.context.drawImage(img,0,0,size.width,size.height);
-
-	editor.drawCanvas.width = size.width;
-	editor.drawCanvas.height = size.height;
-	editor.drawCanvas.top = -size.height;
-
-	templateDisplay = document.getElementById('templateDisplay');
-	templateDisplay.style.width = size.width+"px";
-	templateDisplay.style.height = size.height+"px";
-	templateDisplay.style.minWidth = size.width+"px";
-	templateDisplay.style.minHeight = size.height+"px";
-
-	editor.drawCanvas.addEventListener('mousedown', mouseDown, false);
-    editor.drawCanvas.addEventListener('mouseup', mouseUp, false);
-    editor.drawCanvas.addEventListener('mousemove', mouseMove, false);
-    editor.drawCanvas.addEventListener('mouseout', mouseOut, false);
-    document.addEventListener("mouseup", mouseUpOutsideOfCanvas, false);
-
-    var editorFieldsColorInput = document.getElementById('editorFieldsColorInput');
-    editor.setEditorFieldsColor(editorFieldsColorInput.value);
-    editorFieldsColorInput.onchange = function() { editor.setEditorFieldsColor(this.value); };
-
-    var templateNameField = document.getElementById('templateName');
-    templateNameField.addEventListener('paste', verifyTemplateName, false);
-    templateNameField.addEventListener('input', verifyTemplateName, false);
-}
-
 function setWidth(width, height, maxWidth) {
     if (width != maxWidth){
         var ratio = maxWidth / width;
         return { width: width*ratio, height: height*ratio };
     }
     return {width: width, height: height};
+}
+
+function goToEditing(){
+    $('#templateImg').show();
+    $('#fieldsCanvas').show();
+    $('#templateSettings').show();
+    $('#previewCanvas').hide();
+    $('#previewSettings').hide();
+}
+
+function goToPreview(){
+    if (editor.fields.length > 0){
+        resetPreviewMainNotification();
+        $('#templateImg').hide();
+        $('#fieldsCanvas').hide();
+        $('#templateSettings').hide();
+        $('#previewCanvas').show();
+        $('#previewSettings').show();
+        previewFieldsList();
+        fetchPreviewImage();
+    } else {
+        setMainNotification("Need to include at least 1 field", false);
+    }
+}
+
+function setPreviewMainNotification(text, isSuccess){
+    resetPreviewMainNotification();
+    var previewMainNotification = document.getElementById('previewMainNotification');
+    if (isSuccess) {
+        previewMainNotification.classList.add("success");
+    } else {
+        previewMainNotification.classList.add("fail");
+    }
+    previewMainNotification.innerHTML = text;
+}
+
+function resetPreviewMainNotification(){
+    var previewMainNotification = document.getElementById('previewMainNotification');
+    previewMainNotification.classList.remove("fail");
+    previewMainNotification.classList.remove("success");
+    previewMainNotification.innerHTML = "";
+}
+
+function fetchPreviewImage(){
+    resetPreviewMainNotification();
+    var json = {};
+    json.image = editor.canvas.toDataURL();
+    json.name = "preview";
+    json.metadata = {};
+    json.metadata.fields = editor.fields;
+    json.text = []
+    $('input', document.getElementById('previewFieldsList')).each(function () {
+        json.text.push(this.value);
+    });
+    console.log(json);
+    json = JSON.stringify(json);
+    $.post("/preview",
+             json,
+             function(data) {
+                var img = new Image();
+                img.onload = function () {
+                    previewCanvas = document.getElementById('previewCanvas');
+	                previewContext = previewCanvas.getContext('2d');
+                    previewCanvas.width = this.width;
+                    previewCanvas.height = this.height;
+                    previewContext.drawImage(this,0,0,this.width,this.height);
+                };
+
+                img.src = "data:image/png;base64,"+data;
+            }).fail(function(data) {
+                setPreviewMainNotification(data.responseText, false);
+            });
+}
+
+function previewFieldsList(){
+    var fieldsList = document.getElementById('previewFieldsList');
+    fieldsList.innerHTML = "";
+
+    for (var i in editor.fields){
+        var field = editor.fields[i];
+        var li = document.createElement('li');
+
+        var b = document.createElement('b');
+        b.innerHTML = (+i+1)+". ";
+        li.appendChild(b);
+
+        var input = document.createElement('input');
+        input.type = "text";
+        input.classList.add("text");
+        input.fieldId = i;
+        input.placeholder = "sample text";
+        li.appendChild(input);
+
+        fieldsList.appendChild(li);
+    }
 }

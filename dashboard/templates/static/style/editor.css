@@ -159,7 +159,6 @@ canvas {
     overflow-y:scroll;
     list-style-type: none;
     padding-inline-start: 6px;
-
 }
 
 .fields-list li {
@@ -172,6 +171,15 @@ canvas {
     border-radius: 5px;
     cursor: move;
 }
+
+.fields-list.preview li {
+    cursor: auto;
+}
+
+.fields-list.preview input {
+    width: 100%;
+}
+
 
 .fields-list span {
     font-size: 12px;

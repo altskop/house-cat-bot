@@ -110,12 +110,12 @@ class PostgresConnector:
 
 class TemplateLoader:
 
-    def __init__(self, author, guilds):
+    def __init__(self):
         self.img_blob = None
         self.name = None
         self.fields = None
-        self.author = author['username']+author['discriminator']
-        self.guilds = [x['id'] for x in guilds]
+        self.author = None
+        self.guilds = None
         self.connector = PostgresConnector()
 
     @staticmethod
@@ -139,9 +139,7 @@ class TemplateLoader:
         self._verify_img_size(img)
         self.fields = json['metadata']
         self.validate_metadata(img.size)
-        self.verify_guilds(json)
         self.name = json['name'].lower()
-        self.connector.verify_name_uniqueness(self.name, self.guilds)
 
     def verify_guilds(self, json):
         self.guilds = [x for x in json['guilds'] if x in self.guilds]
@@ -152,12 +150,23 @@ class TemplateLoader:
         base64_data = re.sub('^data:image/.+;base64,', '', image_data)
         self.img_blob = base64.b64decode(base64_data)
 
-    def create_template(self, json):
+    def create_template(self, json, guilds, author):
+        self.author = author['username'] + author['discriminator']
+        self.guilds = [x['id'] for x in guilds]
+        self.verify_guilds(json)
         self.validate_template(json)
-        self.connector.new_template()
+        self.connector.verify_name_uniqueness(self.name, self.guilds)
+        self.connector.new_template(self.img_blob, self.fields, self.name, self.author, self.guilds)
 
     def preview_template(self, json):
+        text = json['text']
+        del (json['text'])
         self.validate_template(json)
-        text_list = ["sample text"] * len(self.fields)
-        img = MemeGenerator(self.img_blob, self.fields, text_list)
+        text_list = []
+        for entry in text:
+            if len(entry) == 0:
+                text_list.append("sample text")
+            else:
+                text_list.append(entry)
+        img = MemeGenerator(self.img_blob, self.fields, text_list).generate()
         return img

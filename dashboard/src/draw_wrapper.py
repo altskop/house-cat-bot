@@ -41,11 +41,11 @@ class GeneratorDraw(ImageDraw.ImageDraw):
         else:  # right
             return x + area_width - line_width
 
-    def text_wrap(self, text, max_width, max_height, font, fontsize):
+    def text_wrap(self, text, max_width, max_height, fontname, fontsize):
         text = text.strip()
         if fontsize < SMALLEST_FONT:
             raise ValueError('Text too big for the field')
-        font = ImageFont.truetype("/storage/memes/fonts/%s.ttf" % font, fontsize)
+        font = ImageFont.truetype("/storage/memes/fonts/%s.ttf" % fontname, fontsize)
         lines = []
         font_max_height = 0
         font_max_width = 0
@@ -77,5 +77,5 @@ class GeneratorDraw(ImageDraw.ImageDraw):
         # If text still too big, rewrap
         # TODO perhaps there is a better way than recursively do this
         if (font_max_height + 1) * len(lines) > max_height or font_max_width > max_width:
-            return self.text_wrap(text, max_width, max_height, fontsize - 1)
+            return self.text_wrap(text, max_width, max_height, fontname, fontsize - 1)
         return lines, font, font_max_height

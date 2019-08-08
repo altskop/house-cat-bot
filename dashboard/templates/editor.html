@@ -6,6 +6,7 @@
             <div class="template-display" id="templateDisplay">
                 <canvas id="templateImg"></canvas>
                 <canvas id="fieldsCanvas"></canvas>
+                <canvas id="previewCanvas"></canvas>
             </div>
             <br>
             <div>
@@ -44,9 +45,23 @@
                     <img src="{{ url_for('static', filename='img/cloud-upload.svg') }}" alt="new" >
                     Upload!
                 </button>
-                <button class="discord-button ui-button" onclick="fetchPreview()">
+                <button class="discord-button ui-button" onclick="goToPreview()">
                     <img src="{{ url_for('static', filename='img/preview.svg') }}" alt="new" >
                     Preview
+                </button>
+            </div>
+        </div>
+        <div id="previewSettings" class="template-settings">
+            <div id="previewMainNotification" class="notification"></div>
+            <ul id="previewFieldsList" class="fields-list preview"></ul>
+            <div class="input-field-section">
+                <button class="discord-button submit-button" onclick="fetchPreviewImage();">
+                    <img src="{{ url_for('static', filename='img/refresh.png') }}" alt="new" >
+                    Refresh preview
+                </button>
+                <button class="discord-button ui-button" onclick="goToEditing()">
+                    <img src="{{ url_for('static', filename='img/edit.png') }}" alt="new" >
+                    Back to editing
                 </button>
             </div>
         </div>

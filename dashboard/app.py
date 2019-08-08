@@ -1,8 +1,9 @@
-from flask import request, render_template, Response, Flask, session, redirect, url_for, jsonify, abort
+from flask import request, render_template, Response, Flask, session, redirect, url_for, jsonify, abort, send_file
 from requests_oauthlib import OAuth2Session
 import os
 import json
 import urllib.parse
+import base64
 from jsonschema import exceptions
 from flask_misaka import Misaka
 from src import bot_client
@@ -137,13 +138,12 @@ def get_common_guilds_with_create_perms():
 @login_required
 def check_template_name():
     try:
-        d = urllib.parse.unquote(request.query_string.decode("utf-8"))
-        data = json.loads(d)
+        data = json.loads(urllib.parse.unquote(request.query_string.decode("utf-8")))
         name = data.get('name')
         guilds = data.get('guilds')  # TODO security concern
         connector = template_loader.PostgresConnector()
         connector.verify_name_uniqueness(name, guilds)
-        return "200"
+        return Response("Name available", status=200)
     except ValueError:
         abort(400)
 
@@ -176,11 +176,6 @@ def index():
     return render_template('layouts/index.html')
 
 
-@app.route('/editor') # TODO remove after tests
-def editor():
-    return render_template('layouts/editor.html')
-
-
 @app.route('/changelog')
 def changelog():
     # TODO verify if this is the best way of doing this? Maybe I could just have a regular page instead
@@ -200,6 +195,18 @@ def dashboard():
     return render_template('layouts/dashboard.html')
 
 
+@app.route('/preview', methods=["POST"])
+def preview():
+    json = request.get_json(force=True)
+    try:
+        loader = template_loader.TemplateLoader()
+        preview = loader.preview_template(json)
+        base64string = base64.b64encode(preview.read())
+        return base64string
+    except ValueError as e:
+        return Response(str(e), status=400)
+
+
 @app.route('/create', methods=["GET"])
 def return_create_page():
     title = 'Create a Meme Template'
@@ -213,8 +220,8 @@ def process_create_request():
     try:
         author = session['user']
         guilds = get_common_guilds_with_create_perms()
-        loader = template_loader.TemplateLoader(author, guilds)
-        loader.create_template(json)
+        loader = template_loader.TemplateLoader()
+        loader.create_template(json, guilds, author)
         return Response("Template created", status=201)
     except ValueError as e:
         return Response(str(e), status=400)
