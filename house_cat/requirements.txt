@@ -1,0 +1,5 @@
+discord.py[voice]
+gtts
+pillow
+aenum
+psycopg2-binary

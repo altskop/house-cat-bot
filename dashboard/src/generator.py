@@ -1,3 +1,6 @@
+# Copy of generator.py in house cat bot
+# TODO find a better way to use this in both places (package it?)
+
 from PIL import Image
 import io
 from .draw_wrapper import GeneratorDraw

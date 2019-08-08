@@ -1,4 +1,5 @@
 var editor;
+var delayTimer;
 
 //$(document).ready(function() { // TODO debug function remove later
 //    loadEditor("https://upload.wikimedia.org/wikipedia/en/8/8b/Purplecom.jpg");
@@ -165,7 +166,7 @@ class Editor {
 
     addNewField(w, h){
 
-        if (Math.abs(w) < 9 && Math.abs(h) < 9) {
+        if (Math.abs(w) < 15 && Math.abs(h) < 9) {
             return;
         }
 
@@ -242,8 +243,8 @@ class Editor {
 
     finishResizing(){
         var field = this.fields[this.selectedField.index];
-        if (field.w < 9) {
-            field.w = 9;
+        if (field.w < 15) {
+            field.w = 15;
         }
         if (field.h < 9) {
             field.h = 9;
@@ -582,6 +583,24 @@ function changeAllFont(){
     refreshFieldsList();
 }
 
+function verifyNameUniqueness(name, servers, element, inputNotification){
+
+    clearTimeout(delayTimer);
+    delayTimer = setTimeout(function() {
+        $.get("/check-template-name",
+             JSON.stringify({"name": name, "guilds": servers}),
+             function(data) {
+               element.classList.add("success");
+             }
+           ).fail(function(data) {
+                inputNotification.innerHTML = "This template name is already in use in one of the selected servers.";
+                inputNotification.classList.add("fail");
+                element.classList.add("notfound");
+            });
+    }, 1000); // Will do the ajax stuff after 1000 ms, or 1 s
+
+}
+
 
 function verifyTemplateName(e){
     var element = e.target;
@@ -603,6 +622,14 @@ function verifyTemplateName(e){
         element.classList.add("notfound");
         inputNotification.innerHTML = "A template name has to:<br> - start with a letter<br> - contain only letters, numbers and dashes<br> - dashes can't be repeated in a row (like --).";
         inputNotification.classList.add("fail");
+        return;
+    }
+
+    if (text.length>2) {
+        servers = getSelectedServers()
+        if (servers.length > 0){
+            verifyNameUniqueness(text, servers, element, inputNotification);
+        }
     }
 }
 
@@ -665,8 +692,31 @@ function resetMainNotification(){
     mainNotification.innerHTML = "";
 }
 
-function uploadTemplate(){
+function changeUploadBtnToLoading(btn){
+    btn.disabled=true;
+    btn.classList.add("loading");
+    $('img', btn).each(function () {
+        console.log(this); //log every element found to console output
+        $(this).hide();
+    });
+    btn.innerHTML = "<div class=\"button-loader\"></div>" + btn.innerHTML
+}
+
+function changeUploadBtnToDefault(btn){
+    btn.disabled=false;
+    btn.classList.remove("loading");
+    $('img', btn).each(function () {
+        $(this).show();
+    });
+    $('div', btn).each(function () {
+        this.remove();
+    });
+//    btn.innerHTML.replace("<div class=\"button-loader\"></div>", "");
+}
+
+function uploadTemplate(btn){
     if (verifyTemplateNameSize() && verifyNumberOfFields() && verifySelectedServers()){
+        changeUploadBtnToLoading(btn);
        resetMainNotification();
 
         console.log('test');
@@ -686,10 +736,12 @@ function uploadTemplate(){
              function(data) {
                document.body.style.cursor = "auto";
                setMainNotification("Template created!", true);
+               changeUploadBtnToDefault(btn)
              }
            ).fail(function(data) {
                 document.body.style.cursor = "auto";
-                setMainNotification(data.statusText, false);
+                setMainNotification(data.responseText, false);
+                changeUploadBtnToDefault(btn)
             });
     }
 }

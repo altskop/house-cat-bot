@@ -1,6 +1,8 @@
 from flask import request, render_template, Response, Flask, session, redirect, url_for, jsonify, abort
 from requests_oauthlib import OAuth2Session
 import os
+import json
+import urllib.parse
 from jsonschema import exceptions
 from flask_misaka import Misaka
 from src import bot_client
@@ -12,6 +14,7 @@ OAUTH2_CLIENT_ID = os.environ['OAUTH2_CLIENT_ID']
 OAUTH2_CLIENT_SECRET = os.environ['OAUTH2_CLIENT_SECRET']
 ACCESS_TOKEN = os.environ['ACCESS_TOKEN']
 OAUTH2_REDIRECT_URI = 'http://localhost:5000/callback'
+OWNER_ID = os.environ['OWNER_ID']
 
 API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discordapp.com/api')
 AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
@@ -121,21 +124,43 @@ def callback():
     return redirect(url)
 
 
-@app.route('/me')
-@login_required
-def me():
+def get_common_guilds_with_create_perms():
     discord = make_session(token=session.get('oauth2_token'))
-    user = discord.get(API_BASE_URL + '/users/@me').json()
     guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
-    return jsonify(user=user, guilds=guilds)
+    result = house_cat_client.get_common_guilds_to_create_template(guilds)
+    if session['user']['id'] == OWNER_ID:
+        result.append({"name": "global", "id": "global"})
+    return result
+
+
+@app.route('/check-template-name', methods=["GET"])
+@login_required
+def check_template_name():
+    try:
+        d = urllib.parse.unquote(request.query_string.decode("utf-8"))
+        data = json.loads(d)
+        name = data.get('name')
+        guilds = data.get('guilds')  # TODO security concern
+        connector = template_loader.PostgresConnector()
+        connector.verify_name_uniqueness(name, guilds)
+        return "200"
+    except ValueError:
+        abort(400)
 
 
 @app.route('/guilds-create', methods=["GET"])
 @login_required
 def guilds_create():
+    return jsonify(get_common_guilds_with_create_perms())
+
+
+def get_common_guilds_with_manage_perms():
     discord = make_session(token=session.get('oauth2_token'))
     guilds = discord.get(API_BASE_URL + '/users/@me/guilds').json()
-    return jsonify(house_cat_client.get_common_guilds_to_create_template(guilds))
+    result = house_cat_client.get_common_guilds_to_manage(guilds)
+    if session['user']['id'] == OWNER_ID:
+        result.append({"name": "global", "id": "global"})
+    return result
 
 
 @app.route('/guilds-manage', methods=["GET"])
@@ -186,11 +211,13 @@ def return_create_page():
 def process_create_request():
     json = request.get_json(force=True)
     try:
-        template_loader.create_template(json)
+        author = session['user']
+        guilds = get_common_guilds_with_create_perms()
+        loader = template_loader.TemplateLoader(author, guilds)
+        loader.create_template(json)
         return Response("Template created", status=201)
-    except FileExistsError as e:
-        print(e)
-        return Response("This template name is already in use", status=400)
+    except ValueError as e:
+        return Response(str(e), status=400)
     except exceptions.ValidationError as e:
         print(e)
         return Response("Invalid request.", status=400)

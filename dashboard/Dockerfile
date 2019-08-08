@@ -8,6 +8,8 @@ RUN apk --update add --no-cache \
     linux-headers \
     ca-certificates \
     python3-dev \
+    musl-dev \
+    postgresql-dev \
     libffi-dev \
     libressl-dev \
     libxslt-dev \
@@ -30,7 +32,8 @@ WORKDIR /web_console
 
 RUN apk --update add --no-cache \
     ffmpeg \
-    bash
+    bash \
+    postgresql-dev
 
 EXPOSE 5000
 

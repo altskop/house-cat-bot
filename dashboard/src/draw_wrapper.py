@@ -1,3 +1,6 @@
+# Copy of draw_wrapper.py in house cat bot
+# TODO find a better way to use this in both places (package it?)
+
 from PIL import Image
 from PIL import ImageFont
 from PIL import ImageDraw

@@ -3,3 +3,4 @@ flask
 Flask-Misaka
 pillow
 jsonschema
+psycopg2-binary

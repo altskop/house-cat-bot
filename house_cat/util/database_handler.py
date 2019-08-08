@@ -1,4 +1,6 @@
-import sqlite3
+import psycopg2
+import psycopg2.extras
+import os
 import time
 from abc import ABC, abstractmethod
 
@@ -12,8 +14,12 @@ def current_time():
 
 
 class DBHandler(ABC):
-    def __init__(self, db_file):
-        self.db_file = db_file
+    def __init__(self, host, port, dbname, user, password):
+        self.host = host
+        self.port = port
+        self.dbname = dbname
+        self.user = user
+        self.password = password
         self.initialize_db()
 
     @abstractmethod
@@ -81,9 +87,19 @@ class DBHandler(ABC):
 
     @property
     def conn(self):
-        conn = sqlite3.connect(self.db_file)
-        conn.row_factory = sqlite3.Row
+        conn = psycopg2.connect(
+            host=self.host,
+            port=self.port,
+            database=self.dbname,
+            user=self.user,
+            password=self.password
+        )
+        conn.autocommit = True
         return conn
+
+    @property
+    def cursor(self):
+        return self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
     @staticmethod
     def _dict_factory(cursor, row):

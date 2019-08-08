@@ -8,6 +8,8 @@ RUN apk --update add --no-cache \
     linux-headers \
     ca-certificates \
     python3-dev \
+    musl-dev \
+    postgresql-dev \
     libffi-dev \
     libressl-dev \
     libxslt-dev \
@@ -15,7 +17,8 @@ RUN apk --update add --no-cache \
     zlib-dev \
     freetype-dev
 
-RUN pip install -U "discord.py[voice]" gtts pillow aenum
+COPY requirements.txt /requirements.txt
+RUN pip install --no-cache-dir -r /requirements.txt
 
 FROM python:3.6-alpine
 
@@ -31,6 +34,6 @@ RUN apk --update add --no-cache \
     opus \
     ffmpeg \
     bash \
-    sqlite
+    postgresql-dev
 
 CMD [ "python", "-u", "./house_cat.py" ]

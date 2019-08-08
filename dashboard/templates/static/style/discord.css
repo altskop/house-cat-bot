@@ -82,6 +82,10 @@ button img {
     background-color: rgb(100, 178, 133);
 }
 
+.submit-button.loading {
+    background-color: rgb(55, 57, 62);
+}
+
 div.description {
     color: rgb(155, 155, 155);
     margin-bottom: 21.44px;

@@ -75,6 +75,17 @@
   animation: spin 1s linear infinite;
 }
 
+.button-loader {
+  display: inline-block;
+  vertical-align: middle;
+  border: 3px solid #f3f3f3; /* Light grey */
+  border-top: 3px solid rgb(99, 150, 208); /* Blue */
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+}
+
 input.text {
   background-color: rgb(30, 30, 34);
   width: 300px;
