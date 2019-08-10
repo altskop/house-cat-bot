@@ -15,7 +15,7 @@ class HouseCatBot(commands.Bot):
 
         self.database = DiscordDb(host=os.environ['PG_HOST'],
                                   port=os.environ['PG_PORT'],
-                                  dbname='house_cat_db',
+                                  dbname=os.environ['PG_DATABASE'],
                                   user=os.environ['PG_USER'],
                                   password=os.environ['PG_PASSWORD'])
 

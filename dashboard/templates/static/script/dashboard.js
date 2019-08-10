@@ -65,7 +65,7 @@ function populateServerList(serverListElement, data, isManage) {
         img.title = guild['name'];
         img.classList.add('discord-avatar');
         img.classList.add('server-icon');
-         // TODO No restrictions for dev purpopses
+
         if (isManage){
             img.onclick = chooseServer;
         } else {
@@ -73,7 +73,7 @@ function populateServerList(serverListElement, data, isManage) {
         }
 
         div.appendChild(img);
-        // TODO append FULL on top of image and add a "full" class if server is full
+
         if (!isManage){
             if (guild['full'] == true) {
                 var txt = document.createElement("p");

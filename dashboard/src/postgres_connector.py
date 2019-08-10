@@ -10,13 +10,13 @@ class PostgresConnector:
         self.conn = psycopg2.connect(
             host=os.environ['PG_HOST'],
             port=os.environ['PG_PORT'],
-            database='house_cat_db',
+            database=os.environ['PG_DATABASE'],
             user=os.environ['PG_USER'],
             password=os.environ['PG_PASSWORD']
         )
         self.conn.autocommit = True
 
-    def new_template(self, img, metadata, name, author, guilds):  # TODO restrict amount of memes allowed on server
+    def new_template(self, img, metadata, name, author, guilds):
         with self.conn:
             cursor = self.conn.cursor()
             sql_string = "insert into memes (metadata, image, author) VALUES (%s,%s,%s) RETURNING id;"

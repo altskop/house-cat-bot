@@ -7,7 +7,6 @@ class HouseCatClient:
     """
     This class will be used to get the list of all guilds the
     bot is in. Required for the dashboard.
-    TODO cache in database
     """
     def __init__(self, token):
         self.token = token
@@ -21,13 +20,11 @@ class HouseCatClient:
         return bool((permissions >> 4) & 1)
 
     def get_common_guilds_to_manage(self, user_guilds: list):
-        # print(user_guilds)  # TODO TypeError: string indices must be integers BUG
         list_user_guilds = [x['id'] for x in user_guilds]
         common_guilds = self._get_common_guilds(list_user_guilds)
         return [x for x in user_guilds if x['id'] in common_guilds and self._is_moderator(x['permissions'])]
 
     def get_common_guilds_to_create_template(self, user_guilds: list):
-        # print(user_guilds)  # TODO TypeError: string indices must be integers BUG
         list_user_guilds = [x['id'] for x in user_guilds]
         common_guilds = self._get_common_guilds(list_user_guilds)
         return [x for x in user_guilds if x['id'] in common_guilds and self._can_manage_messages(x['permissions'])]
