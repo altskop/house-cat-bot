@@ -32,9 +32,6 @@
         </div>
     </div>
 
-    <div id="loading"><div class="loader"></div></div>
-
-
     <div id="backBtnDiv">
         <a href="dashboard">
             <button class="ui-button" style="float: left;">
@@ -49,11 +46,29 @@
         "Manage Channels" permission is required.
     </div>
 
+    <div id="manageMemes">
+        Select a server to manage templates:
+        <br><br>
+        <div id="manageServerList" class="server-list"></div>
+        <br><br>
+        <div id="manageTemplatesView" class="editor" style="display: none;">
+            <div class="template-display" id="manageTemplateDisplay">
+                <canvas id="managePreviewCanvas"></canvas>
+            </div>
+            <div id="manageSettings" class="template-settings">
+                <ul id="templatesList" class="fields-list manageTemplates"></ul>
+            </div>
+        </div>
+        <div id="noTemplatesFound" style="display: none;">There are no templates loaded for this server.</div>
+    </div>
+
     <div id="createNewMeme">
-        Select servers to upload the new template to:
-        <br><br>
-        <div id="serverList" class="server-list"></div>
-        <br><br>
+        <div id="serverListContainer">
+            Select servers to upload the new template to:
+            <br><br>
+            <div id="serverList" class="server-list"></div>
+            <br><br>
+        </div>
         <div id="imageLoadingInputs">
             <div id="dropzone" class="dropzone"><span>Drop an image here</span></div>
             <br>
@@ -74,12 +89,7 @@
         {% include 'editor.html' %}
     </div>
 
-    <div id="manageMemes">
-        Select a server to manage templates:
-        <br><br>
-        <div id="manageServerList" class="server-list"></div>
-        <br><br>
-    </div>
+    <div id="loading"><div class="loader"></div></div>
 
 </div>
 

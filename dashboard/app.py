@@ -9,6 +9,7 @@ from flask_misaka import Misaka
 from src import bot_client
 from src import template_loader
 from src import postgres_connector
+from src.generator import MemeGenerator
 from functools import wraps
 
 
@@ -133,7 +134,9 @@ def get_user_guilds():
         session['guilds'] = guilds
         return guilds
     elif "guilds" in session:
-        print("Error: response from API is null, falling back to session cache.")
+        # TODO verify that this is not a security concern because it very well could be
+        print("Error: response from API is null, falling back to session cache:")
+        print(session['guilds'])
         return session['guilds']
     else:
         abort(500)
@@ -183,6 +186,15 @@ def guilds_manage():
     return jsonify(get_common_guilds_with_manage_perms())
 
 
+@app.route('/guild-templates', methods=["GET"])
+@login_required
+def guild_templates():
+    guild = request.args.get('id')
+    if guild in [x['id'] for x in get_common_guilds_with_manage_perms()]:
+        templates = postgres_connector.PostgresConnector().list_guild_memes(guild)
+        return jsonify(templates)
+
+
 @app.route('/')
 def index():
     return render_template('layouts/index.html')
@@ -208,6 +220,7 @@ def dashboard():
 
 
 @app.route('/preview', methods=["POST"])
+@login_required
 def preview():
     json = request.get_json(force=True)
     try:
@@ -219,14 +232,60 @@ def preview():
         return Response(str(e), status=400)
 
 
-@app.route('/create', methods=["GET"])
-def return_create_page():
-    title = 'Create a Meme Template'
-    return render_template('layouts/create.html',
-                           title=title)
+@app.route('/template', methods=["GET"])
+@login_required
+def template():
+    try:
+        name = request.args.get("name")
+        guild = request.args.get("guild")
+        if guild in [x['id'] for x in get_common_guilds_with_manage_perms()]:
+            connector = postgres_connector.PostgresConnector()
+            template = connector.get_meme_template(name, guild)
+            base64string = base64.b64encode(template['image']).decode('UTF-8')
+            return jsonify(image=base64string, metadata=template['metadata'])
+        else:
+            abort(403)
+    except ValueError as e:
+        return Response(str(e), status=400)
+
+
+@app.route('/delete', methods=["GET"])
+@login_required
+def delete():
+    try:
+        name = request.args.get("name")
+        guild = request.args.get("guild")
+        print(name, guild)
+        if guild in [x['id'] for x in get_common_guilds_with_manage_perms()]:
+            connector = postgres_connector.PostgresConnector()
+            connector.delete_meme_template(name, guild)
+            return Response(status=200)
+        else:
+            abort(403)
+    except ValueError as e:
+        return Response(str(e), status=400)
+
+
+@app.route('/preview', methods=["GET"])
+@login_required
+def preview_get():
+    try:
+        name = request.args.get("name")
+        guild = request.args.get("guild")
+        if guild in [x['id'] for x in get_common_guilds_with_manage_perms()]:
+            connector = postgres_connector.PostgresConnector()
+            template = connector.get_meme_template(name, guild)
+            preview = MemeGenerator(bytes(template['image']), template['metadata'], []).generate()
+            base64string = base64.b64encode(preview.read())
+            return base64string
+        else:
+            abort(403)
+    except ValueError as e:
+        return Response(str(e), status=400)
 
 
 @app.route('/create', methods=["POST"])
+@login_required
 def process_create_request():
     json = request.get_json(force=True)
     try:
@@ -234,6 +293,22 @@ def process_create_request():
         guilds = get_common_guilds_with_create_perms()
         loader = template_loader.TemplateLoader()
         loader.create_template(json, guilds, author)
+        return Response("Template created", status=201)
+    except ValueError as e:
+        return Response(str(e), status=400)
+    except exceptions.ValidationError as e:
+        print(e)
+        return Response("Invalid request.", status=400)
+
+
+@app.route('/update', methods=["POST"])
+@login_required
+def update():
+    json = request.get_json(force=True)
+    try:
+        guilds = get_common_guilds_with_manage_perms()
+        loader = template_loader.TemplateLoader()
+        loader.update_template(json, guilds)
         return Response("Template created", status=201)
     except ValueError as e:
         return Response(str(e), status=400)

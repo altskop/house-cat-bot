@@ -19,14 +19,15 @@ $( function() {
     $( "#fieldsList" ).disableSelection();
   } );
 
-function loadEditor(url) {
+function loadEditor(url, isNew) {
+    resetMainNotification();
     var img = new Image();
 
     img.onload = function () {
         loadImage(this);
     };
 
-    editor = new Editor();
+    editor = new Editor(isNew);
 
     img.setAttribute('crossOrigin', 'anonymous');
     img.src = url;
@@ -40,6 +41,8 @@ function loadEditor(url) {
     window.onbeforeunload = function() {
         return true;
     };
+
+    return editor;
 }
 
 function loadImage (img)
@@ -91,7 +94,7 @@ class Color {
 }
 
 class Editor {
-    constructor() {
+    constructor(isNew) {
         this.canvas = document.getElementById('templateImg');
 	    this.context = this.canvas.getContext('2d');
         this.drawCanvas = document.getElementById('fieldsCanvas');
@@ -105,6 +108,7 @@ class Editor {
         this.currentField = {};
         this.mouseClick = null;
         this.resizer = new Resizer();
+        this.isNew = isNew;
     };
 
     reset(){
@@ -747,36 +751,67 @@ function changeUploadBtnToDefault(btn){
 }
 
 function uploadTemplate(btn){
-    if (verifyTemplateNameSize() && verifyNumberOfFields() && verifySelectedServers()){
-        changeUploadBtnToLoading(btn);
-       resetMainNotification();
+    if (editor.isNew){
+        if (verifyTemplateNameSize() && verifyNumberOfFields() && verifySelectedServers()){
+            changeUploadBtnToLoading(btn);
+           resetMainNotification();
 
-        console.log('test');
-        var json = {};
-        json.name = document.getElementById("templateName").value;
-        json.guilds = getSelectedServers();
-        json.image = editor.canvas.toDataURL();
-        json.metadata = {};
-        json.metadata.fields = editor.fields;
-        console.log(json);
+            var json = {};
+            json.name = document.getElementById("templateName").value;
+            json.guilds = getSelectedServers();
+            json.image = editor.canvas.toDataURL();
+            json.metadata = {};
+            json.metadata.fields = editor.fields;
 
-        json = JSON.stringify(json);
-        document.body.style.cursor = "progress";
+            json = JSON.stringify(json);
+            document.body.style.cursor = "progress";
 
-        $.post("/create",
-             json,
-             function(data) {
-               document.body.style.cursor = "auto";
-               setMainNotification("Template created!", true);
-               changeUploadBtnToDefault(btn);
-               // Disable navigation prompt
-               window.onbeforeunload = null;
-             }
-           ).fail(function(data) {
-                document.body.style.cursor = "auto";
-                setMainNotification(data.responseText, false);
-                changeUploadBtnToDefault(btn)
-            });
+            $.post("/create",
+                 json,
+                 function(data) {
+                   document.body.style.cursor = "auto";
+                   setMainNotification("Template created!", true);
+                   changeUploadBtnToDefault(btn);
+                   // Disable navigation prompt
+                   window.onbeforeunload = null;
+                 }
+               ).fail(function(data) {
+                    document.body.style.cursor = "auto";
+                    setMainNotification(data.responseText, false);
+                    changeUploadBtnToDefault(btn)
+                });
+        }
+    } else {
+        if (verifyTemplateNameSize() && verifyNumberOfFields()){
+           changeUploadBtnToLoading(btn);
+           resetMainNotification();
+
+            var json = {};
+            json.name = document.getElementById("templateName").value;
+            json.oldName = editor.oldName;
+            json.guilds = getChosenServer();
+            json.image = editor.canvas.toDataURL();
+            json.metadata = {};
+            json.metadata.fields = editor.fields;
+
+            json = JSON.stringify(json);
+            document.body.style.cursor = "progress";
+
+            $.post("/update",
+                 json,
+                 function(data) {
+                   document.body.style.cursor = "auto";
+                   setMainNotification("Template updated!", true);
+                   changeUploadBtnToDefault(btn);
+                   // Disable navigation prompt
+                   window.onbeforeunload = null;
+                 }
+               ).fail(function(data) {
+                    document.body.style.cursor = "auto";
+                    setMainNotification(data.responseText, false);
+                    changeUploadBtnToDefault(btn)
+                });
+    }
     }
 }
 

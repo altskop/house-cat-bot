@@ -26,9 +26,39 @@ class PostgresConnector:
             sql_string = "insert into guildMemes (name, guild, meme) VALUES %s;"
             psycopg2.extras.execute_values(cursor, sql_string, guilds_values)
 
+    def get_meme_template(self, name, guild):
+        conn = self.conn
+        with conn:
+            c = self.cursor
+            guilds = tuple([str(guild)] + ["global"])
+            sql_string = "select image, metadata from guildMemes join memes on (meme=id) where name=%s and guild in %s;"
+            c.execute(sql_string, (name, guilds))
+            return c.fetchone()
+
+    def delete_meme_template(self, name, guild):
+        conn = self.conn
+        with conn:
+            c = self.cursor
+            sql_string = "delete from guildMemes where name=%s and guild=%s returning meme;"
+            c.execute(sql_string, (name, guild))
+            meme_id = c.fetchone()['meme']
+            try:
+                sql_string = "delete from memes where id=%s;"
+                c.execute(sql_string, (meme_id,))
+            except Exception as e:
+                print(e)
+
+    def list_guild_memes(self, guild):
+        conn = self.conn
+        with conn:
+            c = self.cursor
+            sql_string = "select name, author from guildMemes join memes on (meme=id) where guild=%s;"
+            c.execute(sql_string, (str(guild),))
+            return c.fetchall()
+
     def verify_name_uniqueness(self, name, guilds):
         with self.conn:
-            cursor = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cursor = self.cursor
             guilds = tuple(guilds + ["global"])
             sql_string = "select count(*) from guildMemes where name=%s and guild in %s;"
             cursor.execute(sql_string, (name, guilds))
@@ -39,7 +69,7 @@ class PostgresConnector:
     def get_guilds_templates(self, guilds: list):
         guilds_values = [(x['id'],) for x in guilds]
         with self.conn:
-            cursor = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            cursor = self.cursor
             sql_string = "select guild, count(*) from guildMemes where guild in %s group by guild;"
             cursor.execute(sql_string, (tuple(guilds_values),))
             result = cursor.fetchall()
@@ -54,10 +84,19 @@ class PostgresConnector:
                     guild['full'] = False
             return guilds
 
+    def get_author(self, name, guild):
+        conn = self.conn
+        with conn:
+            c = self.cursor
+            guilds = tuple(guild)
+            sql_string = "select author from guildMemes join memes on (meme=id) where name=%s and guild in %s;"
+            c.execute(sql_string, (name, guilds))
+            return c.fetchone()['author']
+
     def get_guilds(self):
         conn = self.conn
         with conn:
-            c = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            c = self.cursor
             c.execute("select id from guilds;")
             return c.fetchall()
 
@@ -65,9 +104,13 @@ class PostgresConnector:
         guilds_values = [(x,) for x in guilds]
         conn = self.conn
         with conn:
-            c = self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+            c = self.cursor
             c.execute("truncate guilds;")
             insert_query = 'insert into guilds (id) values %s'
             psycopg2.extras.execute_values(
                 c, insert_query, guilds_values
             )
+
+    @property
+    def cursor(self):
+        return self.conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)

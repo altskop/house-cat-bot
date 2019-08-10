@@ -83,6 +83,8 @@ function populateServerList(serverListElement, data, isManage) {
             } else {
                 img.classList.add('available');
             }
+        } else {
+            img.classList.add('available');
         }
         serverListElement.appendChild(div);
 
@@ -98,13 +100,7 @@ function selectServer(event) {
             element.classList.add("selected");
         }
     }
-}
-
-function chooseServer(event) {
-    $('img', $('#manageServerList')).each(function () {
-        this.classList.remove("selected");
-    });
-    selectServer(event);
+    return element.id;
 }
 
 function getSelectedServers(){
@@ -117,8 +113,6 @@ function getSelectedServers(){
     });
     return list;
 }
-
-
 
 /* When the user clicks on the button,
 toggle between hiding and showing the dropdown content */
@@ -150,7 +144,7 @@ function handleUrlFieldUpdate(e) {
     var url = element.value;
     if (url.startsWith("http://") || url.startsWith("https://")){
         isUrlAnImage(url, 2000).then(
-          function(result) { loadEditor(url); },
+          function(result) { loadEditor(url, true); },
           function(error) { element.classList.add('notfound'); }
         );
     }
@@ -161,7 +155,7 @@ function readImage(input) {
         var reader = new FileReader();
 
         reader.onload = function (e) {
-            loadEditor(e.target.result);
+            loadEditor(e.target.result, true);
         };
 
         reader.readAsDataURL(input.files[0]);
@@ -216,3 +210,159 @@ function goToManage() {
     }
   });
 };
+
+function chooseServer(event) {
+    $('img', $('#manageServerList')).each(function () {
+        this.classList.remove("selected");
+    });
+    id = selectServer(event);
+    getGuildTemplates(id);
+}
+
+function getChosenServer(){
+    var list = [];
+    var serverList = document.getElementById('serverList');
+    $('img', $('#manageServerList')).each(function () {
+        if (this.classList.contains("selected")) {
+            list.push(this.id); //log every element found to console output
+            return list;
+        }
+    });
+    return list;
+}
+
+function getGuildTemplates(id){
+    $("#manageTemplatesView").hide();
+    $("#noTemplatesFound").hide();
+    $("#createNewMeme").hide();
+    // Disable navigation prompt
+    window.onbeforeunload = null;
+    previewCanvas = document.getElementById('managePreviewCanvas');
+    previewCanvas.width = 0;
+    previewCanvas.height = 0;
+    $("#loading").show();
+    $.getJSON("/guild-templates",
+        {"id": id},
+        function(data) {
+            $("#loading").hide();
+            if (data.length>0) {
+                $("#manageTemplatesView").show();
+                renderTemplatesList(data, id);
+            } else {
+                $("#noTemplatesFound").show();
+            }
+          });
+}
+
+function renderTemplatesList(list, guild){
+    var fieldsList = document.getElementById('templatesList');
+    fieldsList.innerHTML = "";
+
+    for (var i in list){
+        var template = list[i];
+        var li = document.createElement('li');
+        li.name = template['name'];
+        li.guild = guild;
+        li.onclick = function(){
+             $('li', fieldsList).each(function () {
+                this.classList.remove("selected");
+            });
+            this.classList.add("selected");
+            fetchManagePreviewImage(this.name, this.guild);
+        }
+
+        var b = document.createElement('b');
+        b.innerHTML = template["name"];
+        li.appendChild(b);
+
+        var div = document.createElement('div');
+
+        var span = document.createElement('span');
+        span.innerHTML = "by "+template["author"];
+        div.appendChild(span);
+
+
+        var editButton = document.createElement('span');
+        editButton.classList.add("copy-button");
+        editButton.innerHTML = "&#9998";
+        editButton.onclick = function() { event.stopPropagation(); this.disabled=true; editTemplate($(this).closest('li')); };
+        div.appendChild(editButton);
+
+        var deleteButton = document.createElement('span');
+        deleteButton.classList.add("delete-button");
+        deleteButton.innerHTML = "&#10006";
+        deleteButton.onclick = function() { event.stopPropagation(); this.disabled=true; deleteTemplate($(this).closest('li')); };
+        div.appendChild(deleteButton);
+
+        li.appendChild(div);
+        fieldsList.appendChild(li);
+    }
+}
+
+function fetchManagePreviewImage(name, guild){
+    $('#manageTemplateDisplay > .button-loader').remove();
+    previewDisplayDiv = document.getElementById('manageTemplateDisplay');
+    previewDisplayDiv.style.width = "300px";
+    previewDisplayDiv.style.height = "300px";
+    loader = document.createElement("div");
+    loader.classList.add("button-loader");
+    previewDisplayDiv.appendChild(loader);
+    previewCanvas = document.getElementById('managePreviewCanvas');
+    previewCanvas.width = 0;
+    previewCanvas.height = 0;
+    $.get("/preview",
+             {"name": name, "guild": guild},
+             function(data) {
+                var img = new Image();
+                img.onload = function () {
+	                previewContext = previewCanvas.getContext('2d');
+                    previewCanvas.width = this.width;
+                    previewCanvas.height = this.height;
+                    previewContext.drawImage(this,0,0,this.width,this.height);
+
+                    previewDisplayDiv.style.width = this.width+"px";
+                    previewDisplayDiv.style.height = this.height+"px";
+                    $('#manageTemplateDisplay > .button-loader').remove();
+                };
+
+                img.src = "data:image/png;base64,"+data;
+            }).fail(function(data) {
+                $('#manageTemplateDisplay > .button-loader').remove();
+            });
+}
+
+function deleteTemplate(element){
+    element = element.get(0);
+    document.body.style.cursor = "progress";
+    $.ajax({
+        url: "/delete",
+        type: 'GET',
+        data: {"name": element.name, "guild": element.guild},
+        success: function(data) {
+            element.remove();
+            document.body.style.cursor = "auto";
+        },
+        error: function(data){
+            document.body.style.cursor = "auto";
+        }
+        });
+
+}
+
+function editTemplate(element){
+    element = element.get(0);
+    $("#loading").show();
+    $("#manageTemplatesView").hide();
+    $.getJSON("/template",
+        {"name": element.name, "guild": element.guild},
+         function(data) {
+           $("#createNewMeme").show();
+           $("#serverListContainer").hide();
+           $("#loading").hide();
+           loadEditor("data:image/png;base64,"+data['image'], false);
+           editor.fields = data['metadata']['fields'];
+           editor.oldName = element.name;
+           $("#templateName").val(element.name);
+           refreshFieldsList();
+    });
+}

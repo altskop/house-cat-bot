@@ -10,6 +10,10 @@ from jsonschema import validate, exceptions
 schema = {
     "type": "object",
     "properties": {
+        "oldName": {"type": "string",
+                    "maxLength": 21,
+                    "minLength": 3,
+                    "pattern": "^(?!.*(-)-*\1)[a-zA-Z][a-zA-Z0-9-]*$"},
         "name": {"type": "string",
                  "maxLength": 21,
                  "minLength": 3,
@@ -107,9 +111,17 @@ class TemplateLoader:
         self.name = json['name'].lower()
 
     def verify_guilds(self, json):
+        self.verify_guilds_perms(json)
+        self.verify_guild_isnt_full()
+
+    def verify_guilds_perms(self, json):
+        print(json['guilds'])
+        print(self.guilds)
         self.guilds = [x for x in json['guilds'] if x in self.guilds]
         if len(self.guilds) == 0:
             raise ValueError("No selected guilds with sufficient perms")
+
+    def verify_guild_isnt_full(self):
         guilds_dicts = [{"id": x} for x in self.guilds]
         guilds_availability = self.connector.get_guilds_templates(guilds_dicts)
         self.guilds = [x['id'] for x in guilds_availability if x['full'] is False]
@@ -126,6 +138,17 @@ class TemplateLoader:
         self.verify_guilds(json)
         self.validate_template(json)
         self.connector.verify_name_uniqueness(self.name, self.guilds)
+        self.connector.new_template(self.img_blob, self.fields, self.name, self.author, self.guilds)
+
+    def update_template(self, json, guilds):
+        old_template_name = json['oldName']
+        self.guilds = [x['id'] for x in guilds]
+        self.verify_guilds_perms(json)
+        self.validate_template(json)
+        if self.name != old_template_name.lower():
+            self.connector.verify_name_uniqueness(self.name, self.guilds)
+        self.author = self.connector.get_author(old_template_name, self.guilds)
+        self.connector.delete_meme_template(old_template_name, self.guilds[0])
         self.connector.new_template(self.img_blob, self.fields, self.name, self.author, self.guilds)
 
     def preview_template(self, json):

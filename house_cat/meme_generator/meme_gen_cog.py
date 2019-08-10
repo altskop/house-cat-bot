@@ -21,7 +21,8 @@ class MemeGeneratorCog(commands.Cog):
 
     async def list(self, ctx):
         embed = discord.Embed(title="",
-                              description=":white_check_mark: Check your DMs for the list of all templates available on this server.",
+                              description=":ballot_box_with_check: "
+                                          "Check your DMs for the list of all templates available on this server.",
                               color=self.bot.color)
         await ctx.send(embed=embed)
         await self.global_list(ctx)

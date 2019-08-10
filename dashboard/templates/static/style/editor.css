@@ -176,6 +176,23 @@ canvas {
     cursor: auto;
 }
 
+.fields-list.manageTemplates li {
+    cursor: pointer;
+}
+
+.fields-list.manageTemplates li.selected {
+    background-color: rgb(118, 137, 212);
+    color: white;
+}
+
+li.selected>b{
+    color: white;
+}
+
+li.selected>span{
+    color: white;
+}
+
 .fields-list.preview input {
     width: 100%;
 }
