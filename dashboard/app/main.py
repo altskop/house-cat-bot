@@ -226,7 +226,7 @@ def preview():
         loader = template_loader.TemplateLoader()
         preview = loader.preview_template(json)
         base64string = base64.b64encode(preview.read())
-        return base64string
+        return Response(base64string, status=200)
     except ValueError as e:
         return Response(str(e), status=400)
 
@@ -276,7 +276,7 @@ def preview_get():
             template = connector.get_meme_template(name, guild)
             preview = MemeGenerator(bytes(template['image']), template['metadata'], []).generate()
             base64string = base64.b64encode(preview.read())
-            return base64string
+            return Response(base64string, status=200)
         else:
             abort(403)
     except ValueError as e:
