@@ -79,7 +79,8 @@ class PostgresConnector:
                 if entry is None:
                     guild['full'] = False
                 elif entry >= 5:
-                    guild['full'] = True
+                    if guild['id'] is not "global":
+                        guild['full'] = True
                 else:
                     guild['full'] = False
             return guilds
