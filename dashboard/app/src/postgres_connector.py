@@ -78,9 +78,8 @@ class PostgresConnector:
                 entry = guilds_templates.get(guild['id'])
                 if entry is None:
                     guild['full'] = False
-                elif entry >= 5:
-                    if guild['id'] is not "global":
-                        guild['full'] = True
+                elif entry >= 5 and guild['id'] != "global":
+                    guild['full'] = True
                 else:
                     guild['full'] = False
             return guilds
