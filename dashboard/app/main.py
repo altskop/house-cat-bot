@@ -202,7 +202,7 @@ def index():
 @app.route('/changelog')
 def changelog():
     # TODO verify if this is the best way of doing this? Maybe I could just have a regular page instead
-    with open("../CHANGELOG.md", "r") as file:
+    with open("/CHANGELOG.md", "r") as file:
         changelog = file.read()
         return render_template('layouts/changelog.html', changelog=changelog)
 
