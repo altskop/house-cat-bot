@@ -24,7 +24,6 @@ AUTHORIZATION_BASE_URL = API_BASE_URL + '/oauth2/authorize'
 TOKEN_URL = API_BASE_URL + '/oauth2/token'
 
 app = Flask(__name__, static_url_path="", static_folder="templates/static")
-app.debug = True
 app.config['SECRET_KEY'] = OAUTH2_CLIENT_SECRET
 Misaka(app)
 house_cat_client = bot_client.HouseCatClient(ACCESS_TOKEN)
@@ -318,4 +317,4 @@ def update():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=80)

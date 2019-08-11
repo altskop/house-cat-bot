@@ -34,6 +34,7 @@ RUN apk --update add --no-cache \
     opus \
     ffmpeg \
     bash \
-    postgresql-dev
+    postgresql-dev \
+    sqlite
 
 CMD [ "python", "-u", "./house_cat.py" ]

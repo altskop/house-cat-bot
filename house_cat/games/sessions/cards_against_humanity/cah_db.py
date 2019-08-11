@@ -1,10 +1,10 @@
-from util import database_handler
+import sqlite3
 import random
 
 
-class CahDb(database_handler.DBHandler):
+class CahDb:
     def __init__(self):
-        database_handler.DBHandler.__init__(self, "/storage/db/cards-against-humanity.db")
+        self.db_file = "/storage/db/cards-against-humanity.db"  # TODO change to postgres
         self.seed = 0
         self.new_seed()
         self.black_index = 0
@@ -64,4 +64,10 @@ class CahDb(database_handler.DBHandler):
 
     def discard(self, cards: list):
         self.discard_pile.extend(cards)
+
+    @property
+    def conn(self):
+        conn = sqlite3.connect(self.db_file)
+        conn.row_factory = sqlite3.Row
+        return conn
 

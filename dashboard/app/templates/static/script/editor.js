@@ -1,3 +1,7 @@
+// TODO God this is horrible
+//   I'll refactor this I swear
+//   one day
+
 var editor;
 var delayTimer;
 
