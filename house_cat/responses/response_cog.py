@@ -79,31 +79,6 @@ class ResponseCog(commands.Cog):
     async def help(self, ctx, *args):
         # TODO this will likely change to a simple link to a webpage when the dashboard is complete.
         embed = discord.Embed(title="",
-                              description=":construction:"
-                                          "**This bot is still under development so expect rapid changes. Some "
-                                          "functionality might be incomplete or missing.**"
-                                          ":construction:\n"
-                                          "For questions/suggestions, please email **housecat@altskop.com**.\n\n"
-                                          "Meme Generation:\n"
-                                          "**$meme MEME_NAME \"sample text\" \"sample text\"** - to generate a meme. "
-                                          "Get the MEME_NAME from the meme list. To preview the meme and text fields, "
-                                          "type in **$meme MEME_NAME**. Example: **$meme its-retarded \"test\"**\n"
-                                          "**$meme list** - to list all available memes.\n"
-                                          "**$mock \"text\"** - to create a Spongebob mocking meme with \"jumpy\" text."
-                                          " If you don't provide any text, it will use the previous message.\n\n"
-                                          "Games:\n"
-                                          "**$game NAME [ARGUMENTS]** - to start a game. For example, to challenge "
-                                          "someone to a game of *Rock-Paper-Scissors*, type in **$game rps MENTION** or"
-                                          " **$game rock-paper-scissors MENTION**. To start a *Cards Against Humanity*"
-                                          " game, type **$game cards-against-humanity** or **$game cah**\n"
-                                          "**$roll** to roll a dice. Default dice is d20. You can use **$roll N** where"
-                                          " N is a number to "
-                                          "specify the amount of sides on a die (like $roll 5); you can also do $roll "
-                                          "NdN to roll multiple dice.\n\n"
-                                          "Other:\n"
-                                          "**$magic8ball** - to get a prediction from the Magical 8 Ball.\n"
-                                          "**$poll \"question\" \"option 1\" \"option 2\"** - to start a poll.\n"
-                                          "**$thesaurize** - to thesaurize the previous message (replace words with"
-                                          " synonyms).\n"
+                              description="Please visit http:/housecat.altskop.com/commands to view the list of all commands."
                               , color=self.bot.color)
         return await ctx.send(embed=embed)
