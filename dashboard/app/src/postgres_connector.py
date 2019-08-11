@@ -52,7 +52,7 @@ class PostgresConnector:
         conn = self.conn
         with conn:
             c = self.cursor
-            sql_string = "select name, author from guildMemes join memes on (meme=id) where guild=%s;"
+            sql_string = "select name, author from guildMemes join memes on (meme=id) where guild=%s order by name;"
             c.execute(sql_string, (str(guild),))
             return c.fetchall()
 
@@ -78,7 +78,7 @@ class PostgresConnector:
                 entry = guilds_templates.get(guild['id'])
                 if entry is None:
                     guild['full'] = False
-                elif entry >= 5 and guild['id'] != "global":
+                elif entry >= 15 and guild['id'] != "global":
                     guild['full'] = True
                 else:
                     guild['full'] = False
