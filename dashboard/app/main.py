@@ -16,7 +16,7 @@ from functools import wraps
 OAUTH2_CLIENT_ID = os.environ['OAUTH2_CLIENT_ID']
 OAUTH2_CLIENT_SECRET = os.environ['OAUTH2_CLIENT_SECRET']
 ACCESS_TOKEN = os.environ['ACCESS_TOKEN']
-OAUTH2_REDIRECT_URI = 'http://localhost:5000/callback'
+OAUTH2_REDIRECT_URI = 'http://housecat.altskop.com/callback'
 OWNER_ID = os.environ['OWNER_ID']
 
 API_BASE_URL = os.environ.get('API_BASE_URL', 'https://discordapp.com/api')
