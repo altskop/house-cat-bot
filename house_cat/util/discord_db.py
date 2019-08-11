@@ -9,7 +9,7 @@ class DiscordDb(database_handler.DBHandler):
         conn = self.conn
         with conn:
             c = self.cursor
-            sql_string = "select name, author from guildMemes join memes on (meme=id) where guild=%s;"
+            sql_string = "select name, author from guildMemes join memes on (meme=id) where guild=%s order by name;"
             c.execute(sql_string, (str(guild),))
             return c.fetchall()
 
@@ -17,7 +17,7 @@ class DiscordDb(database_handler.DBHandler):
         conn = self.conn
         with conn:
             c = self.cursor
-            sql_string = "select name, metadata from guildMemes join memes on (meme=id) where guild='global';"
+            sql_string = "select name, metadata from guildMemes join memes on (meme=id) where guild='global' order by name;"
             c.execute(sql_string)
             return c.fetchall()
 
