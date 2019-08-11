@@ -31,7 +31,10 @@ class MemeGeneratorCog(commands.Cog):
     async def global_list(self, ctx):
         global_memes = self.bot.database.list_global_memes()
         chunks_templates = list(utils.chunks(global_memes, 24))
-        embed = discord.Embed(title="Global Meme Templates", description="", color=self.bot.color)
+        embed = discord.Embed(title="Global Meme Templates",
+                              description="These templates are available everywhere on any server that the bot is a "
+                                          "part of. Use \"$meme TEMPLATE_NAME\" to preview the template.",
+                              color=self.bot.color)
         for chunk in chunks_templates:  # TODO move this to a class (Embed wrapper?)
             for template in chunk:
                 embed.add_field(name=template['name'], value="Fields: `"+str(len(template['metadata']['fields']))+"`", inline=True)
@@ -41,7 +44,9 @@ class MemeGeneratorCog(commands.Cog):
     async def guild_list(self, ctx):
         guild_memes = self.bot.database.list_guild_memes(ctx.guild.id)
         chunks_templates = list(utils.chunks(guild_memes, 24))
-        embed = discord.Embed(title="Meme Templates of **"+ctx.guild.name+"**", description="", color=self.bot.color)
+        embed = discord.Embed(title="Meme Templates of **"+ctx.guild.name+"**",
+                              description="These templates are user-created and only available at this server.",
+                              color=self.bot.color)
         for chunk in chunks_templates:  # TODO move this to a class (Embed wrapper?)
             for template in chunk:
                 embed.add_field(name=template['name'], value="by "+template['author'], inline=True)
