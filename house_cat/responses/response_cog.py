@@ -72,7 +72,7 @@ class ResponseCog(commands.Cog):
             await ctx.send(embed=embed)
 
     @commands.command(name="commands")
-    async def commands(self, ctx, *args):
+    async def list_commands(self, ctx, *args):
         return await self.help(ctx)
 
     @commands.command(name="help")
