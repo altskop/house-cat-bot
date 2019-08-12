@@ -73,7 +73,6 @@ class ResponseCog(commands.Cog):
 
     @commands.command(name="help")
     async def help(self, ctx, *args):
-        # TODO this will likely change to a simple link to a webpage when the dashboard is complete.
         embed = discord.Embed(title="",
                               description="Please visit http://housecat.altskop.com/commands to view the list of all commands."
                               , color=self.bot.color)
