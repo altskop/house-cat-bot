@@ -136,9 +136,17 @@ span.code {
 .table-of-contents ul {
   padding: 0;
 }
-.table-of-contents li {
-  margin: 0 0 0.25em 0;
+ul ul {
+  font-size: 13px;
 }
+ul ul li{
+  margin: 6px 0 6px 0;
+}
+ul ul li a{
+  font-size: 13px;
+  color: rgb(138, 138, 140);
+}
+
 .table-of-contents a:active {
   text-decoration: underline;
 }
