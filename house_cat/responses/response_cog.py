@@ -73,11 +73,14 @@ class ResponseCog(commands.Cog):
 
     @commands.command(name="commands")
     async def list_commands(self, ctx, *args):
-        return await self.help(ctx)
+        await self.display_help_msg(ctx)
 
     @commands.command(name="help")
     async def help(self, ctx, *args):
+        await self.display_help_msg(ctx)
+
+    async def display_help_msg(self, ctx):
         embed = discord.Embed(title="",
                               description="Please visit http://housecat.altskop.com/commands to view the list of all commands."
                               , color=self.bot.color)
-        return await ctx.send(embed=embed)
+        await ctx.send(embed=embed)
