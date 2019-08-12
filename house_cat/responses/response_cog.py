@@ -71,15 +71,6 @@ class ResponseCog(commands.Cog):
 
             await ctx.send(embed=embed)
 
-            guilds_chunked = utils.chunks(guilds, 24)
-            embed = discord.Embed(title="Servers", description="", color=self.bot.color)
-            for chunk in guilds_chunked:  # TODO move this to a class (Embed wrapper?)
-                for guild in chunk:
-                    value = "{0} channels, {1} users, owned by {2}".format(len(guild.text_channels), len(guild.members), guild.owner.name)
-                    embed.add_field(name=guild.name, value=value, inline=True)
-                await ctx.send(embed=embed)
-                embed = discord.Embed(title="", description="", color=self.bot.color)
-
     @commands.command(name="help")
     async def help(self, ctx, *args):
         # TODO this will likely change to a simple link to a webpage when the dashboard is complete.
