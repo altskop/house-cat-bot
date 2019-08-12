@@ -30,7 +30,7 @@ class MemeGeneratorCog(commands.Cog):
         await self.generate_meme(ctx, id, text)
 
     @commands.command(name="meme-list")
-    async def meme(self, ctx):
+    async def meme_list(self, ctx):
         await self.list(ctx)
 
     async def list(self, ctx):
