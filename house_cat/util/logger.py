@@ -11,5 +11,5 @@ def get_guild_name(guild):
 
 
 def log_command(ctx, message):
-    message = "[%s|%s] %s".format(get_guild_name(ctx.guild), ctx.author.name + ctx.author.discriminator, message)
+    message = "[{0}|{1}] {2}".format(get_guild_name(ctx.guild), ctx.author.name + ctx.author.discriminator, message)
     logger.info(message)
