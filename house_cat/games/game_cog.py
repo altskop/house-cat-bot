@@ -22,6 +22,16 @@ class GameCog(commands.Cog):
 
     @commands.command(name="game")
     async def game(self, ctx, *args):
+        if len(args) == 0:
+            embed = discord.Embed(title="",
+                                  description="There are 2 games available at the moment.\n"
+                                              "To play Rock-Paper-Scissors, use `$game rps @PLAYER`, or `$game rock-paper-scissors @PLAYER`. "
+                                              "You can mention multiple people to play with.\n"
+                                              "To play Cards-Against-Humanity, use `game cah` or `game cards-against-humanity`.\n"
+                                              "Use $help for more info.",
+                                  color=self.bot.color)
+            await ctx.send(embed=embed)
+            return
         try:
             game_id = args[0]
             game = games[game_id](self, ctx, list(args[1:]))

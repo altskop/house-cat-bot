@@ -20,9 +20,7 @@ class ResponseCog(commands.Cog):
             if message.content[0] == "$":
                 logger.info(message, message.content)
                 return
-            else:
-                logger.debug(message, message.content)
-        chance_of_reaction = 0.006
+        chance_of_reaction = 0.005
         if random.random() < chance_of_reaction:
             await message.add_reaction("❤")
         if message.author == self.bot.user:
@@ -33,6 +31,13 @@ class ResponseCog(commands.Cog):
 
     @commands.command(name="poll")
     async def poll(self, ctx, *args):
+        if len(args) == 0:
+            embed = discord.Embed(title="",
+                                  description="Use `poll \"Question\" \"Option 1\" \"Option 2\"` to create a poll. "
+                                              "You may add more than 2 options (up to 9). Use $help for more info.",
+                                  color=self.bot.color)
+            await ctx.send(embed=embed)
+            return
         try:
             poll = Poll(ctx, *args)
             await poll.poll()

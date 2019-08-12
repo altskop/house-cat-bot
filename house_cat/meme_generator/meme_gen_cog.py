@@ -12,12 +12,26 @@ class MemeGeneratorCog(commands.Cog):
 
     @commands.command(name="meme")
     async def meme(self, ctx, *args):
+        if len(args) == 0:
+            embed = discord.Embed(title="",
+                                  description="Use `meme list` to list all available templates. "
+                                              "After choosing a template, "
+                                              "use `meme TEMPLATE_NAME \"text 1\" \"text 2\"` to generate a meme. "
+                                              "Number of fields vary per template, use `meme TEMPLATE_NAME` to get "
+                                              "a preview.",
+                                  color=self.bot.color)
+            await ctx.send(embed=embed)
+            return
         if args[0].lower() == "list":
             await self.list(ctx)
             return
         id = args[0].lower()
         text = list(args[1:])
         await self.generate_meme(ctx, id, text)
+
+    @commands.command(name="meme-list")
+    async def meme(self, ctx):
+        await self.list(ctx)
 
     async def list(self, ctx):
         embed = discord.Embed(title="",
@@ -32,7 +46,7 @@ class MemeGeneratorCog(commands.Cog):
         global_memes = self.bot.database.list_global_memes()
         chunks_templates = list(utils.chunks(global_memes, 24))
         embed = discord.Embed(title="Global Meme Templates",
-                              description="These templates are available everywhere on any server that the bot is a "
+                              description="These templates are available on any server that the bot is a "
                                           "part of. Use \"$meme TEMPLATE_NAME\" to preview the template.",
                               color=self.bot.color)
         for chunk in chunks_templates:  # TODO move this to a class (Embed wrapper?)
