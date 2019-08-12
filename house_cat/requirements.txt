@@ -3,3 +3,4 @@ gtts
 pillow
 aenum
 psycopg2-binary
+dblpy

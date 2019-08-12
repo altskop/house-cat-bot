@@ -18,7 +18,7 @@ class ResponseCog(commands.Cog):
     async def on_message(self, message):
         if len(message.content) > 0:
             if message.content[0] == "$":
-                logger.info(message, message.content)
+                logger.log_command(message, message.content)
                 return
         chance_of_reaction = 0.005
         if random.random() < chance_of_reaction:
