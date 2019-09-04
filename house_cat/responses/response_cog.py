@@ -20,9 +20,10 @@ class ResponseCog(commands.Cog):
                 logger.log_command(message, message.content)
                 return
         chance_of_reaction = 0.005
-        if message.channel.permissions_for(message.guild.me).add_reactions:
-            if random.random() < chance_of_reaction:
-                await message.add_reaction("❤")
+        if not isinstance(message.channel, discord.DMChannel):
+            if message.channel.permissions_for(message.guild.me).add_reactions:
+                if random.random() < chance_of_reaction:
+                    await message.add_reaction("❤")
         if message.author == self.bot.user:
             return
 
