@@ -43,6 +43,6 @@ bot.remove_command('help')
 bot.add_cog(MemeGeneratorCog(bot))
 bot.add_cog(ResponseCog(bot))
 bot.add_cog(GameCog(bot))
-bot.add_cog(DiscordBotsOrgAPI(bot))
+# bot.add_cog(DiscordBotsOrgAPI(bot))
 bot.run(os.environ["ACCESS_TOKEN"])
 

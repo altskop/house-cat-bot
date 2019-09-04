@@ -3,4 +3,4 @@ gtts
 pillow
 aenum
 psycopg2-binary
-dblpy
+dblpy==0.3.1

@@ -1,6 +1,5 @@
 import discord
 import discord.ext.commands as commands
-import os
 from . import generator
 import random
 from util import utils
@@ -18,7 +17,9 @@ class MemeGeneratorCog(commands.Cog):
                                               "After choosing a template, "
                                               "use `meme TEMPLATE_NAME \"text 1\" \"text 2\"` to generate a meme. "
                                               "Number of fields vary per template, use `meme TEMPLATE_NAME` to get "
-                                              "a preview.",
+                                              "a preview.\n"
+                                              "To create your own template, visit http://housecat.altskop.com and "
+                                              "use the dashboard.",
                                   color=self.bot.color)
             await ctx.send(embed=embed)
             return
@@ -29,7 +30,7 @@ class MemeGeneratorCog(commands.Cog):
         text = list(args[1:])
         await self.generate_meme(ctx, id, text)
 
-    @commands.command(name="meme-list")
+    @commands.command(name="meme-list", aliases=["memelist", "meme_list"])
     async def meme_list(self, ctx):
         await self.list(ctx)
 
@@ -59,7 +60,8 @@ class MemeGeneratorCog(commands.Cog):
         guild_memes = self.bot.database.list_guild_memes(ctx.guild.id)
         chunks_templates = list(utils.chunks(guild_memes, 24))
         embed = discord.Embed(title="Meme Templates of **"+ctx.guild.name+"**",
-                              description="These templates are user-created and only available at this server.",
+                              description="These templates are user-created and only available at this server. "
+                                          "Make your own at http://housecat.altskop.com",
                               color=self.bot.color)
         for chunk in chunks_templates:  # TODO move this to a class (Embed wrapper?)
             for template in chunk:
@@ -67,18 +69,21 @@ class MemeGeneratorCog(commands.Cog):
             await ctx.author.send(embed=embed)
             embed = discord.Embed(title="", description="", color=self.bot.color)
 
-    @commands.command(name="mock-text")
-    async def mock_text(self, ctx, text=None):
-        result = await self.text_to_mock(ctx, text)
+    @commands.command(name="mock-text", aliases=["mock_text"])
+    async def mock_text(self, ctx, *args):
+        result = await self.text_to_mock(ctx, args)
         await ctx.send(result)
 
     @commands.command(name="mock")
-    async def mock(self, ctx, text=None):
-        result = [await self.text_to_mock(ctx, text)]
+    async def mock(self, ctx, *args):
+        result = [await self.text_to_mock(ctx, args)]
         await self.generate_meme(ctx, "mocking-spongebob", result)
 
-    async def text_to_mock(self, ctx, text):
-        if text is None:
+    async def text_to_mock(self, ctx, args):
+        text = ""
+        if len(args) > 0:
+            text = " ".join(args)
+        else:
             async for message in ctx.channel.history(limit=1, before=ctx.message):
                 text = message.content
         result = ""

@@ -32,6 +32,10 @@ class GameCog(commands.Cog):
                                   color=self.bot.color)
             await ctx.send(embed=embed)
             return
+
+        if isinstance(ctx.channel, discord.DMChannel):
+            return
+
         try:
             game_id = args[0]
             game = games[game_id](self, ctx, list(args[1:]))
@@ -57,10 +61,6 @@ class GameCog(commands.Cog):
         self.game_sessions.remove(session)
         print("Session unsubscribed! Current list: ")
         print(self.game_sessions)
-        # Debug statements below: making sure sessions don't leak memory
-        # obj = objgraph.by_type('games.sessions.rock_paper_scissors.RockPaperScissorsSession')
-        # print(len(obj))
-        # print(obj)
 
     def is_session_in_channel(self, session_type, channel):
         for session in self.game_sessions:

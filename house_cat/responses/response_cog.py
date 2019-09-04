@@ -4,7 +4,6 @@ from .response_builder import ResponseBuilder
 from .poll import Poll
 from .thesaurus import thesaurus
 from . import magic8ball
-from util import utils
 from util import logger
 import random
 
@@ -21,13 +20,11 @@ class ResponseCog(commands.Cog):
                 logger.log_command(message, message.content)
                 return
         chance_of_reaction = 0.005
-        if random.random() < chance_of_reaction:
-            await message.add_reaction("❤")
+        if message.channel.permissions_for(message.guild.me).add_reactions:
+            if random.random() < chance_of_reaction:
+                await message.add_reaction("❤")
         if message.author == self.bot.user:
             return
-        # if self.response_builder.msg_fits_template("IM-SO-TIRED", message.content):
-        #     text = self.response_builder.get_response("CLEANING-HALLWAY")
-        #     await message.channel.send(text)
 
     @commands.command(name="poll")
     async def poll(self, ctx, *args):
@@ -51,7 +48,7 @@ class ResponseCog(commands.Cog):
             embed = discord.Embed(title="", description=response, color=self.bot.color)
             await ctx.send(embed=embed)
 
-    @commands.command(name="magic8ball")
+    @commands.command(name="magic8ball", aliases=["8ball"])
     async def magic_8_ball(self, ctx, *args):
         response = magic8ball.get_response()
         embed = discord.Embed(title="", description=response['text'], color=response['color'])
@@ -71,15 +68,8 @@ class ResponseCog(commands.Cog):
 
             await ctx.send(embed=embed)
 
-    @commands.command(name="commands")
-    async def list_commands(self, ctx, *args):
-        await self.display_help_msg(ctx)
-
-    @commands.command(name="help")
+    @commands.command(name="help", aliases=["commands", "housecat"])
     async def help(self, ctx, *args):
-        await self.display_help_msg(ctx)
-
-    async def display_help_msg(self, ctx):
         embed = discord.Embed(title="",
                               description="Please visit http://housecat.altskop.com/commands to view the list of all commands."
                               , color=self.bot.color)
