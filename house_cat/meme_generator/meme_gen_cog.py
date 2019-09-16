@@ -41,7 +41,8 @@ class MemeGeneratorCog(commands.Cog):
                               color=self.bot.color)
         await ctx.send(embed=embed)
         await self.global_list(ctx)
-        await self.guild_list(ctx)
+        if ctx.guild is not None:
+            await self.guild_list(ctx)
 
     async def global_list(self, ctx):
         global_memes = self.bot.database.list_global_memes()
@@ -99,7 +100,9 @@ class MemeGeneratorCog(commands.Cog):
 
     async def generate_meme(self, ctx, id, text):
         try:
-            guild = ctx.guild.id
+            guild = None
+            if ctx.guild is not None:
+                guild = ctx.guild.id
             template = self.bot.database.get_meme_template(id, guild)
             image_blob = bytes(template['image'])
             gen = generator.MemeGenerator(image_blob, template['metadata'], text)

@@ -30,7 +30,10 @@ class PostgresConnector:
         conn = self.conn
         with conn:
             c = self.cursor
-            guilds = tuple([str(guild)] + ["global"])
+            if guild is not None:
+                guilds = tuple([str(guild)] + ["global"])
+            else:
+                guilds = ("global",)
             sql_string = "select image, metadata from guildMemes join memes on (meme=id) where name=%s and guild in %s;"
             c.execute(sql_string, (name, guilds))
             return c.fetchone()
