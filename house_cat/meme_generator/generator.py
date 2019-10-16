@@ -72,10 +72,3 @@ class MemeGenerator:
         image.save(output, format="PNG")
         output.seek(0)
         return output
-
-
-if __name__ == "__main__":
-    gen = MemeGenerator("its-retarded", ["I'm exhausted I tried to clean a hallway today and it was so hard"])
-    file = gen.add_text_to_image()
-    img = Image.open(file)
-    img.show()

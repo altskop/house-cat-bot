@@ -30,6 +30,15 @@ class DiscordDb(database_handler.DBHandler):
             c.execute(sql_string, (name, guilds))
             return c.fetchone()
 
+    def get_random_comics(self, amount, series, guild):
+        conn = self.conn
+        with conn:
+            c = self.cursor
+            guilds = tuple([str(guild)] + ["global"])
+            sql_string = "select image from comics where series=%s and guild in %s order by random() limit %s;"
+            c.execute(sql_string, (series, guilds, amount))
+            return c.fetchall()
+
     def get_guilds(self):
         conn = self.conn
         with conn:
@@ -54,15 +63,18 @@ class DiscordDb(database_handler.DBHandler):
         with conn:
             c = conn.cursor()
             try:
-                c.execute("select id, metadata, image, author from memes;")
-                c.execute("select name, guild, meme from guildMemes;")
-                c.execute("select command, arg1, arg2, args, author, guild, datetime, success from queries;")
-                c.execute("select id from guilds;")
+                # c.execute("select id, metadata, image, author from memes;")
+                # c.execute("select name, guild, meme from guildMemes;")
+                # c.execute("select command, arg1, arg2, args, author, guild, datetime, success from queries;")
+                # c.execute("select id from guilds;")
+                c.execute("select id, series, guild, image from comics;")
             except psycopg2.ProgrammingError:
                 # Purge tables
-                c.execute("DROP TABLE IF EXISTS memes, guildMemes;")
-                c.execute("DROP TABLE IF EXISTS queries;")
-                c.execute("DROP TABLE IF EXISTS guilds;")
+                # TODO revisit
+                # c.execute("DROP TABLE IF EXISTS memes, guildMemes;")
+                # c.execute("DROP TABLE IF EXISTS queries;")
+                # c.execute("DROP TABLE IF EXISTS guilds;")
+                # c.execute("DROP TABLE IF EXISTS comics;")
                 # Create tables
                 c.execute("create table memes("
                           "id SERIAL primary key not null,"
@@ -89,3 +101,8 @@ class DiscordDb(database_handler.DBHandler):
                 c.execute("create table guilds("
                           "id varchar(20) not null primary key"
                           ");")
+                c.execute("create table comics("
+                          "id serial primary key,"
+                          " series varchar(30) not null,"
+                          " guild varchar(20) not null,"
+                          " image bytea not null);")
