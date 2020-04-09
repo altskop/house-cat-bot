@@ -38,14 +38,16 @@ class HouseCatClient:
         return list(set(self.guilds()).intersection(user_guilds))
 
     def guilds(self):
-        response = self._get_guilds()
-        if response.status_code == 200:
-            guilds = [x['id'] for x in response.json()]
-            PostgresConnector().set_guilds(guilds)
-            return guilds
-        if response.status_code == 429:
-            guilds = PostgresConnector().get_guilds()
-            return [x['id'] for x in guilds]
+        # response = self._get_guilds()
+        # if response.status_code == 200:
+        #     guilds = [x['id'] for x in response.json()]
+        #     PostgresConnector().set_guilds(guilds)
+        #     return guilds
+        # if response.status_code == 429:
+        # TODO it would appear that the web API only returns up to 100 servers.
+        #  therefore, we get it from postgres instead
+        guilds = PostgresConnector().get_guilds()
+        return [x['id'] for x in guilds]
 
     def _get_guilds(self):
         headers = {"Authorization": "Bot " + self.token}
