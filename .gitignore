@@ -4,3 +4,4 @@ venv
 *.ttf
 *.db
 .idea
+house_cat/config.env

@@ -44,6 +44,7 @@ class RockPaperScissorsView(discord.ui.View):
         new_text = self.message.content + "\n\nYou played 🪨!"
         await interaction.response.edit_message(content=new_text, view=self)
         await self.callback(self.player, Choice.rock)
+        self.stop()
 
     @discord.ui.button(label="Paper", style=discord.ButtonStyle.secondary,
                        emoji="📄")
@@ -53,6 +54,7 @@ class RockPaperScissorsView(discord.ui.View):
         new_text = self.message.content + "\n\nYou played 📄!"
         await interaction.response.edit_message(content=new_text, view=self)
         await self.callback(self.player, Choice.paper)
+        self.stop()
 
     @discord.ui.button(label="Scissors", style=discord.ButtonStyle.secondary,
                        emoji="✂")
@@ -62,6 +64,7 @@ class RockPaperScissorsView(discord.ui.View):
         new_text = self.message.content + "\n\nYou played ✂!"
         await interaction.response.edit_message(content=new_text, view=self)
         await self.callback(self.player, Choice.scissors)
+        self.stop()
 
 
 class RockPaperScissorsSession(Session):
