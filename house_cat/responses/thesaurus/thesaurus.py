@@ -7,12 +7,12 @@ from . import common
 MIN_CONFIDENCE_SCORE = 15000
 
 
-async def convert(ctx):
-    sentence = ""
-    async for message in ctx.channel.history(limit=1, before=ctx.message):
-        sentence = message.content.strip()
-        if len(sentence) == 0 and len(message.embeds) > 0:
-            sentence = message.embeds[0].description
+async def convert(txt):
+    sentence = txt
+    # async for message in ctx.channel.history(limit=1, before=ctx.message):
+    #     sentence = message.content.strip()
+    #     if len(sentence) == 0 and len(message.embeds) > 0:
+    #         sentence = message.embeds[0].description
     return await thesaurize(sentence)
 
 

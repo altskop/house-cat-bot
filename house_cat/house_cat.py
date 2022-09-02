@@ -4,7 +4,7 @@ from meme_generator.meme_gen_cog import MemeGeneratorCog
 from responses.response_cog import ResponseCog
 from games.game_cog import GameCog
 from util.discord_db import DiscordDb
-from util.discord_bots_api import DiscordBotsOrgAPI
+# from util.discord_bots_api import DiscordBotsOrgAPI
 import logging
 import os
 
@@ -39,11 +39,11 @@ class HouseCatBot(commands.Bot):
 
 logger = logging.getLogger('house-cat')
 logger.setLevel(logging.DEBUG)
-bot = HouseCatBot(command_prefix='$')
+bot = HouseCatBot()
 bot.remove_command('help')
 bot.add_cog(ComicGeneratorCog(bot))
 bot.add_cog(MemeGeneratorCog(bot))
 bot.add_cog(ResponseCog(bot))
 bot.add_cog(GameCog(bot))
-bot.add_cog(DiscordBotsOrgAPI(bot))
+# bot.add_cog(DiscordBotsOrgAPI(bot))
 bot.run(os.environ["ACCESS_TOKEN"])

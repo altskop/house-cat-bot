@@ -1,4 +1,4 @@
-import dbl
+# import dbl
 import discord
 import os
 from discord.ext import commands
@@ -12,7 +12,7 @@ class DiscordBotsOrgAPI(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.token = os.environ['DBL_TOKEN']
-        self.dblpy = dbl.Client(self.bot, self.token)
+        # self.dblpy = dbl.Client(self.bot, self.token)
         self.updating = self.bot.loop.create_task(self.update_stats())
 
     async def update_stats(self):

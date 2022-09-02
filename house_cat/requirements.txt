@@ -1,6 +1,5 @@
-discord.py[voice]
+py-cord[voice]
 gtts
 pillow
 aenum
 psycopg2-binary
-dblpy==0.3.1

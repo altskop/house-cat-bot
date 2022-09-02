@@ -1,5 +1,6 @@
 import discord
-import discord.ext.commands as commands
+from discord.ext import commands
+from discord.commands import SlashCommandGroup
 from . import generator
 import random
 from util import utils
@@ -8,38 +9,34 @@ from util import utils
 class MemeGeneratorCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        
+    meme_gen = SlashCommandGroup("meme", "Meme generator commands")
 
-    @commands.command(name="meme")
-    async def meme(self, ctx, *args):
-        if len(args) == 0:
-            embed = discord.Embed(title="",
-                                  description="Use `meme list` to list all available templates. "
-                                              "After choosing a template, "
-                                              "use `meme TEMPLATE_NAME \"text 1\" \"text 2\"` to generate a meme. "
-                                              "Number of fields vary per template, use `meme TEMPLATE_NAME` to get "
-                                              "a preview.\n"
-                                              "To create your own template, visit http://housecat.altskop.com and "
-                                              "use the dashboard.",
-                                  color=self.bot.color)
-            await ctx.send(embed=embed)
-            return
-        if args[0].lower() == "list":
-            await self.list(ctx)
-            return
-        id = args[0].lower()
-        text = list(args[1:])
-        await self.generate_meme(ctx, id, text)
+    @meme_gen.command()
+    async def help(self, ctx):
+        embed = discord.Embed(title="",
+                              description="Use `meme list` to list all available templates. "
+                                          "After choosing a template, "
+                                          "use `meme TEMPLATE_NAME \"text 1\" \"text 2\"` to generate a meme. "
+                                          "Number of fields vary per template, use `meme TEMPLATE_NAME` to get "
+                                          "a preview.\n"
+                                          "To create your own template, visit http://housecat.altskop.com and "
+                                          "use the dashboard.",
+                              color=self.bot.color)
+        await ctx.respond(embed=embed)
+        return
 
-    @commands.command(name="meme-list", aliases=["memelist", "meme_list"])
-    async def meme_list(self, ctx):
-        await self.list(ctx)
+    @meme_gen.command()
+    async def meme(self, ctx, meme, text):
+        await self.generate_meme(ctx, meme, text)
 
+    @meme_gen.command()
     async def list(self, ctx):
         embed = discord.Embed(title="",
                               description=":ballot_box_with_check: "
                                           "Check your DMs for the list of all templates available on this server.",
                               color=self.bot.color)
-        await ctx.send(embed=embed)
+        await ctx.respond(embed=embed)
         await self.global_list(ctx)
         if ctx.guild is not None:
             await self.guild_list(ctx)
@@ -54,7 +51,7 @@ class MemeGeneratorCog(commands.Cog):
         for chunk in chunks_templates:  # TODO move this to a class (Embed wrapper?)
             for template in chunk:
                 embed.add_field(name=template['name'], value="Fields: `"+str(len(template['metadata']['fields']))+"`", inline=True)
-            await ctx.author.send(embed=embed)
+            await ctx.author.respond(embed=embed)
             embed = discord.Embed(title="", description="", color=self.bot.color)
 
     async def guild_list(self, ctx):
@@ -70,23 +67,23 @@ class MemeGeneratorCog(commands.Cog):
             await ctx.author.send(embed=embed)
             embed = discord.Embed(title="", description="", color=self.bot.color)
 
-    @commands.command(name="mock-text", aliases=["mock_text"])
-    async def mock_text(self, ctx, *args):
-        result = await self.text_to_mock(ctx, args)
-        await ctx.send(result)
+    @meme_gen.command()
+    async def mock_text(self, ctx, text):
+        result = await self.text_to_mock(ctx, text)
+        await ctx.respond(result)
 
-    @commands.command(name="mock")
-    async def mock(self, ctx, *args):
-        result = [await self.text_to_mock(ctx, args)]
+    @meme_gen.command()
+    async def mock(self, ctx, text):
+        result = [await self.text_to_mock(ctx, text)]
         await self.generate_meme(ctx, "mocking-spongebob", result)
 
-    async def text_to_mock(self, ctx, args):
-        text = ""
-        if len(args) > 0:
-            text = " ".join(args)
-        else:
-            async for message in ctx.channel.history(limit=1, before=ctx.message):
-                text = message.content
+    async def text_to_mock(self, ctx, text):
+        # text = ""
+        # if len(args) > 0:
+        #     text = " ".join(args)
+        # else:
+        #     async for message in ctx.channel.history(limit=1, before=ctx.message):
+        #         text = message.content
         result = ""
         chance = 0.5
         for letter in text:
@@ -107,11 +104,11 @@ class MemeGeneratorCog(commands.Cog):
             image_blob = bytes(template['image'])
             gen = generator.MemeGenerator(image_blob, template['metadata'], text)
             image = gen.generate()
-            await ctx.send(file=discord.File(image, "%s.png" % id))
+            await ctx.respond(file=discord.File(image, "%s.png" % id))
         except ValueError as e:
             print(e)
-            await ctx.send(e)
+            await ctx.respond(e)
         except KeyError as e:
             print(e)
-            await ctx.send("No such meme format as %s" % id)
+            await ctx.respond("No such meme format as %s" % id)
 

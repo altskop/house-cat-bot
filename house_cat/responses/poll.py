@@ -22,7 +22,7 @@ class Poll:
     async def create_poll(self):
         text = "**Poll!**\n {0}\n\n".format(self.title) + \
                "\n".join([str(i+1)+"️\u20E3 "+str(choice) for i, choice in enumerate(self.choices)])
-        self.poll_message = await self.ctx.send(text)
+        self.poll_message = await self.ctx.respond(text)
         for i in range(len(self.choices)):
             await self.poll_message.add_reaction(str(i+1)+"\u20E3")
 

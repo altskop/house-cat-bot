@@ -1,5 +1,6 @@
 import discord
-import discord.ext.commands as commands
+from discord.ext import commands
+from discord.commands import SlashCommandGroup
 from .comic_generator import ComicGenerator
 
 
@@ -7,7 +8,8 @@ class ComicGeneratorCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="comic")
+        self.bot.application_command(name="comic", cls=discord.SlashCommand)(self.comic)
+
     async def comic(self, ctx, amount: int = 3):
         try:
             if amount < 1 or amount > 6:
