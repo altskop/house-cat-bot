@@ -76,6 +76,8 @@ class RockPaperScissorsSession(Session):
         self.interaction = None
         self.original_message = ""
 
+        self.original_message_response = None
+
     async def create(self):
         if len(self.args) == 0:
             raise ValueError("No players specified.")
@@ -100,7 +102,7 @@ class RockPaperScissorsSession(Session):
         embed = discord.Embed(title="",
                               description=challenge_text,
                               color=self.bot.color)
-        await self.ctx.respond(embed=embed)
+        self.original_message_response = await self.ctx.respond(embed=embed)
 
         instruction_text = "{0} challenges you to a game of Rock-Paper-Scissors in **{1}** server, **{2}** channel!\n" \
                                 "Select your move!" \
@@ -158,11 +160,21 @@ class RockPaperScissorsSession(Session):
             # it's a Tie
             text += "\n**🤝 It's a tie!**"
 
-        new_text = self.original_message + "\n\n" + text
-        embed = discord.Embed(title="",
-                              description=new_text,
-                              color=self.bot.color)
-        await self.ctx.edit(embed=embed)
+        player_mentions = " ".join([player.mention for player in self.players])
+
+        # new_text = self.original_message + "\n\n" + text
+        # embed = discord.Embed(title="",
+        #                       description=new_text,
+        #                       color=self.bot.color)
+        # await self.ctx.edit(embed=embed)
+
+        original_message_obj = await self.original_message_response.original_message()
+        
+        # embed = discord.Embed(title="",
+        #                       description=text,
+        #                       color=self.bot.color)
+        await original_message_obj.reply(text)
+
         self.stop()
 
     def is_private_message_expected(self, message):
